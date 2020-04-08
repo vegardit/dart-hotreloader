@@ -1,0 +1,65 @@
+#include: package:pedantic/analysis_options.yaml
+
+# https://github.com/passsy/dart-lint/blob/master/lib/analysis_options.yaml
+include: package:lint/analysis_options.yaml
+
+analyzer:
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+
+# see:
+#  https://github.com/dart-lang/linter/tree/master/lib/src/rules
+#  https://dart-lang.github.io/linter/lints/
+linter:
+  rules:
+    # http://dart-lang.github.io/linter/lints/avoid_as.html
+    avoid_as: true
+
+    # https://github.com/passsy/dart-lint/blob/master/lib/analysis_options.yaml
+    avoid_equals_and_hash_code_on_mutable_classes: true
+
+    # https://dart-lang.github.io/linter/lints/avoid_returning_this.html
+    avoid_returning_this: true
+
+    # https://dart-lang.github.io/linter/lints/avoid_slow_async_io.html
+    avoid_slow_async_io: true
+
+    # https://dart-lang.github.io/linter/lints/constant_identifier_names.html
+    constant_identifier_names: false
+
+    # https://github.com/passsy/dart-lint/blob/master/lib/analysis_options.yaml
+    lines_longer_than_80_chars: false
+
+    # https://dart-lang.github.io/linter/lints/literal_only_boolean_expressions.html
+    literal_only_boolean_expressions: true
+
+    # allow uppercase for final module vars
+    # https://dart-lang.github.io/linter/lints/non_constant_identifier_names.html
+    non_constant_identifier_names: false
+
+    # https://dart-lang.github.io/linter/lints/omit_local_variable_types.html
+    omit_local_variable_types: true
+
+    # https://dart-lang.github.io/linter/lints/prefer_mixin.html
+    prefer_mixin: true
+
+    prefer_single_quotes: true
+
+    # allow java-style comments
+    # https://dart-lang.github.io/linter/lints/slash_for_doc_comments.html
+    slash_for_doc_comments: false
+
+    # warn if await is missing on calling async func
+    # https://dart-lang.github.io/linter/lints/unawaited_futures.html
+    unawaited_futures: true
+
+    # https://dart-lang.github.io/linter/lints/unnecessary_lambdas.html
+    unnecessary_lambdas: true
+
+    # allow new keyword
+    # https://dart-lang.github.io/linter/lints/unnecessary_new.html
+    unnecessary_new: false
+
+    # https://github.com/passsy/dart-lint/blob/master/lib/analysis_options.yaml
+    use_to_and_as_if_applicable: true
