@@ -16,26 +16,37 @@ fi
 
 cd $(dirname $0)/..
 
-echo "Determining current Dart project version..."
+echo "###########################################################"
+echo "# Testing Dart Library Package...                         #"
+echo "###########################################################"
+echo " -> GIT Branch: $GIT_BRANCH"
 projectVersion="$(grep "version: " pubspec.yaml | cut -f2 -d" ")"
 echo " -> Current Version: $projectVersion"
 
-echo "###################################################"
-echo "# Testing Dart Library Package...                 #"
-echo "###################################################"
-echo " -> GIT Branch: $GIT_BRANCH"
-
-pub get
+echo "|---------------------------------------------------------|"
+echo "| Checking source code style...                           |"
+echo "|---------------------------------------------------------|"
 bash tool/checkstyle.sh
+
+echo "|---------------------------------------------------------|"
+echo "| Running tests with minimum versions of dependencies...  |"
+echo "|---------------------------------------------------------|"
+pub downgrade
+bash tool/test.sh
+
+echo "|---------------------------------------------------------|"
+echo "| Running tests with maximum versions of dependencies...  |"
+echo "|---------------------------------------------------------|"
+pub upgrade
 bash tool/test.sh
 
 #
 # decide whether to build/deploy a snapshot version or perform a release build
 #
 if [[ ${MAY_CREATE_RELEASE:-false} = "true" && ${projectVersion:-foo} == ${RELEASE_VERSION:-bar} ]]; then
-   echo "###################################################"
-   echo "# Creating Dart Library Package Release...        #"
-   echo "###################################################"
+   echo "###########################################################"
+   echo "# Creating Dart Library Package Release...                #"
+   echo "###########################################################"
 
    cat <<EOF > ~/.pub-cache/credentials.json
 {

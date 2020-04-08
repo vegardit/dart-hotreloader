@@ -15,11 +15,11 @@ environment:
 
 # https://dart.dev/tools/pub/dependencies#version-constraints
 dependencies:
-  logging: ^0.11.4         # https://pub.dev/packages/logging
-  path: ^1.6.4             # https://pub.dev/packages/path
-  stream_transform: ^1.1.0 # https://pub.dev/packages/stream_transform
+  logging: ^0.11.3+2       # https://pub.dev/packages/logging
+  path: ^1.6.3             # https://pub.dev/packages/path
+  stream_transform: ^1.0.0 # https://pub.dev/packages/stream_transform
   vm_service: ^4.0.0       # https://pub.dev/packages/vm_service
-  watcher: ^0.9.7+14       # https://pub.dev/packages/watcher
+  watcher: ^0.9.7+10       # https://pub.dev/packages/watcher
 
 dev_dependencies:
   lint: ^1.0.0
