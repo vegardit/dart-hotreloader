@@ -1,0 +1,16 @@
+# https://dart.dev/tools/pub/pubspec
+name: hotreloader_example
+description: Hot code reloader example
+
+environment:
+  # https://dart.dev/tools/pub/pubspec#sdk-constraints
+  sdk: '>=2.6.0 <3.0.0'
+
+# https://dart.dev/tools/pub/dependencies#version-constraints
+dependencies:
+  dummylib:
+    path: ./dummylib_v1
+
+dev_dependencies:
+  hotreloader:  # https://pub.dev/packages/hotreloader
+    path: ..

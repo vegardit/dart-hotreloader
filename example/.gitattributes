@@ -1,0 +1,31 @@
+# from https://github.com/alexkaratarakis/gitattributes/blob/master/Java.gitattributes
+
+# Handle line endings automatically for files detected as text
+# and leave all files detected as binary untouched.
+* text=auto
+
+#
+# The above will handle all files NOT found below
+#
+# These files are text and should be normalized (Convert crlf => lf)
+*.css           text
+*.dart          text
+*.html          text
+*.java          text
+*.js            text
+*.json          text
+*.md            text
+*.properties    text
+*.sh            text
+*.txt           text
+*.xml           text
+*.yaml          text
+*.yml           text
+
+# These files are binary and should be left untouched
+# (binary is a macro for -text -diff)
+*.cmd           binary
+*.gif           binary
+*.ico           binary
+*.jpg           binary
+*.png           binary
