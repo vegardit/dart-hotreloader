@@ -19,8 +19,8 @@ Future<void> main(List<String> args) async {
   logging.hierarchicalLoggingEnabled = true;
   // print log messages to stdout/stderr
   logging.Logger.root.onRecord.listen((msg) =>
-      (msg.level < logging.Level.SEVERE ? io.stdout : io.stderr).writeln(
-          '${msg.time} ${msg.level.name} [${Isolate.current.debugName}] ${msg.loggerName}: ${msg.message}'));
+      (msg.level < logging.Level.SEVERE ? io.stdout : io.stderr).write(
+          '${msg.time} ${msg.level.name} [${Isolate.current.debugName}] ${msg.loggerName}: ${msg.message}\n'));
 
   HotReloader.logLevel = logging.Level.CONFIG;
 

@@ -103,7 +103,7 @@ Future<void> main() async {
   // print log messages to stdout/stderr
   logging.Logger.root.onRecord.listen((msg) =>
     (msg.level < logging.Level.SEVERE ? io.stdout : io.stderr)
-    .writeln('${msg.time} ${msg.level.name} [${Isolate.current.debugName}] ${msg.loggerName}: ${msg.message}')
+    .write('${msg.time} ${msg.level.name} [${Isolate.current.debugName}] ${msg.loggerName}: ${msg.message}\n')
   );
 
 
