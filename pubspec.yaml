@@ -1,6 +1,6 @@
 # https://dart.dev/tools/pub/pubspec
 name: hotreloader
-version: 1.0.1-SNAPSHOT
+version: 2.0.0-SNAPSHOT
 
 description: Hot code reloader
 

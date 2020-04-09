@@ -61,9 +61,7 @@ Future<void> test_programmatic_reload() async {
 
   var callbacksTriggered = 0;
   final hotreloader = await HotReloader.create(
-    paths: [
-      'lib' // watch a directory where no change will happen to prevent automatic reload
-    ],
+    automaticReload: false,
     debounceInterval: const Duration(seconds: 0), //
     onBeforeReload: (ctx) {
       callbacksTriggered++;
@@ -97,7 +95,6 @@ Future<void> test_automatic_reload() async {
 
   final reloaded = new Completer<void>();
   final hotreloader = await HotReloader.create(
-    paths: ['test'], // watch the directory where we change a file
     debounceInterval: const Duration(seconds: 0), //
     onAfterReload: (ctx) {
       if (!reloaded.isCompleted) reloaded.complete();

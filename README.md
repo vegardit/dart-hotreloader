@@ -16,7 +16,7 @@
 
 ## <a name="what-is-it"></a>What is it?
 
-This [Dart](https://dart.dev) library package provides a code reloading service that monitors the local file system for changes to a Dart project's source files
+This [Dart](https://dart.dev) library provides a code reloading service that monitors the local file system for changes to a Dart project's source files
 and automatically applies them using the Dart VM's [hot reload](https://github.com/dart-lang/sdk/wiki/Hot-reload) capabilities to the running Dart process.
 
 
@@ -30,7 +30,7 @@ and automatically applies them using the Dart VM's [hot reload](https://github.c
 1. Add this to your pubspec.yml
 
    ```yaml
-   dependencies:
+   dev_dependencies:
      hotreloader: ^1.0.0
    ```
 
@@ -67,11 +67,6 @@ import 'package:hotreloader/hotreloader.dart';
 Future<void> main(List<String> args) async {
 
   final reloader = await HotReloader.create(
-    paths: [ // changes to .dart files in these directories trigger code reload
-      'bin',
-      'lib',
-      'test'
-    ],
     debounceInterval: Duration(seconds: 2), // wait up to 2 seconds after file change before reloading
     onBeforeReload: (ctx) => //
       ctx.isolate.name != 'foobar' && // never reload the isolate named 'foobar'
@@ -98,18 +93,21 @@ This library uses the [logging](https://pub.dev/packages/logging) package for lo
 You can configure the logging framework and change the [log-level](https://github.com/dart-lang/logging/blob/master/lib/src/level.dart) programmatically like this:
 
 ```dart
+import 'dart:io' as io;
 import 'dart:isolate';
 import 'package:hotreloader/hotreloader.dart';
 import 'package:logging/logging.dart' as logging;
 
 Future<void> main() async {
   logging.hierarchicalLoggingEnabled = true;
-  // print log messages to stdout
-  logging.Logger.root.onRecord.listen(
-    (record) => print('${record.time} ${record.level.name} [${Isolate.current.debugName}] ${record.loggerName}: ${record.message}')
+  // print log messages to stdout/stderr
+  logging.Logger.root.onRecord.listen((msg) =>
+    (msg.level < logging.Level.SEVERE ? io.stdout : io.stderr)
+    .writeln('${msg.time} ${msg.level.name} [${Isolate.current.debugName}] ${msg.loggerName}: ${msg.message}')
   );
 
-  HotReloader.logLevel = logging.Level.FINEST;
+
+  HotReloader.logLevel = logging.Level.CONFIG;
 
   final reloader = await HotReloader.create();
 
@@ -136,4 +134,4 @@ This project maintains a [changelog](CHANGELOG.md) and adheres to [Semantic Vers
 
 ## <a name="license"></a>License
 
-All files are released under the [Apache License 2.0](https://github.com/vegardit/haxe-files/blob/master/LICENSE.txt).
+All files are released under the [Apache License 2.0](LICENSE.txt).

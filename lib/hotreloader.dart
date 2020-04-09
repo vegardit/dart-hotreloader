@@ -5,6 +5,8 @@
  * @author Sebastian Thomschke, Vegard IT GmbH
  */
 import 'dart:async';
+import 'dart:io' as io;
+import 'dart:isolate' as isolates;
 
 import 'package:logging/logging.dart' as logging;
 import 'package:path/path.dart' as p;
@@ -14,7 +16,11 @@ import 'package:vm_service/vm_service.dart' as vms;
 import 'package:watcher/watcher.dart';
 
 import 'src/util/docker.dart' show isRunningInDockerContainer;
-import 'src/util/vm.dart' show getVmService;
+import 'src/util/files.dart' show UriExtensions;
+import 'src/util/iterables.dart' show IterableExtensions;
+import 'src/util/pub.dart' as pub;
+import 'src/util/strings.dart' as strings;
+import 'src/util/vm.dart' as vm_utils;
 
 final _LOG = new logging.Logger('hotreloader');
 
@@ -56,7 +62,7 @@ class BeforeReloadContext {
 }
 
 class AfterReloadContext {
-  final Set<WatchEvent> events;
+  final Iterable<WatchEvent> events;
   final Map<vms.IsolateRef, vms.ReloadReport> reloadReports;
   final HotReloadResult result;
 
@@ -71,44 +77,42 @@ class HotReloader {
     return _LOG.level;
   }
 
-  static set logLevel(logging.Level level) {
+  static set logLevel(final logging.Level level) {
     _LOG.level = level;
   }
 
   /**
    * Creates a new HotReloader instance
    *
-   * @param paths list of source directories to watch for file changes, defaults to the current directory and its sub-directories
-   * @param debounceInterval file changes within this time frame only trigger a single code reload
+   * @param automaticReload if false reload must be triggered manually via HotReloader#reloadCode()
+   * @param debounceInterval file changes within this time frame only trigger a single hot reload
+   * @param watchDependencies indicates that changes to library dependencies should also trigger hot reload
    *
    * @throws ArgumentError if [paths] is null or empty
    */
   static Future<HotReloader> create({
-    Iterable<String> paths = const ['lib'],
-    Duration debounceInterval = const Duration(seconds: 1), //
-    bool Function(BeforeReloadContext ctx) onBeforeReload,
-    void Function(AfterReloadContext ctx) onAfterReload,
+    final bool automaticReload = true,
+    final Duration debounceInterval = const Duration(seconds: 1), //
+    final bool watchDependencies = true,
+    final bool Function(BeforeReloadContext ctx) onBeforeReload,
+    final void Function(AfterReloadContext ctx) onAfterReload,
   }) async {
-    if (paths == null || paths.isEmpty) {
-      throw new ArgumentError('[paths] cannot be null or empty!');
+    if (!new io.File('pubspec.yaml').existsSync()) {
+      throw StateError(
+          '''Error: [pubspec.yaml] file not found in current directory.
+For hot code reloading to function properly, Dart needs to be run from the root of your project.''');
     }
 
-    final instance =
-        new HotReloader._(await getVmService(), onBeforeReload, onAfterReload);
-    final isDockerized = await isRunningInDockerContainer();
-    final dirWatchers = paths.map(p.absolute).toSet().map((path) =>
-        // native watcher implementation does not work in docker esp. with a mapped windows drives
-        isDockerized
-            ? new PollingDirectoryWatcher(path)
-            : new DirectoryWatcher(path));
+    final instance = new HotReloader._(
+      watchDependencies,
+      debounceInterval,
+      await vm_utils.getVmService(),
+      onBeforeReload,
+      onAfterReload,
+    );
 
-    for (final watcher in dirWatchers) {
-      _LOG.info('Watching [${watcher.path}] using [${watcher.runtimeType}]...');
-      final watchedStream = watcher.events
-          .debounceBuffer(debounceInterval)
-          .listen(instance._onFilesModified);
-      await watcher.ready;
-      instance._watchedStreams.add(watchedStream);
+    if (automaticReload) {
+      await instance._registerWatchers();
     }
     return instance;
   }
@@ -116,33 +120,113 @@ class HotReloader {
   final bool Function(BeforeReloadContext ctx) _onBeforeReload;
   final void Function(AfterReloadContext ctx) _onAfterReload;
 
+  final Duration _debounceInterval;
+  final bool _watchDependencies;
   final _watchedStreams = <StreamSubscription<List<WatchEvent>>>{};
   final vms.VmService _vmService;
 
   /**
    * private constructor
    */
-  HotReloader._(this._vmService, this._onBeforeReload, this._onAfterReload);
+  HotReloader._(
+    this._watchDependencies,
+    this._debounceInterval,
+    this._vmService,
+    this._onBeforeReload,
+    this._onAfterReload,
+  );
 
+  /**
+   * registers all required file/directory watchers
+   */
+  Future<void> _registerWatchers() async {
+    if (_watchedStreams.isNotEmpty) {
+      await stop();
+    }
+
+    var watchList = ['bin', 'lib', 'test'];
+
+    if (_watchDependencies) {
+      // add .packages file to watch list
+      watchList.add((await pub.packagesFile).path);
+      // add source folders of all dependencies to watch list
+      await (await isolates.Isolate.packageConfig)
+          .readLineByLine()
+          .where((l) => !l.startsWith('#') && l.contains(':'))
+          .map((l) => Uri.parse(strings.substringAfter(l, ':')).toFilePath())
+          .forEach(watchList.add);
+    }
+
+    watchList = watchList.map(p.absolute).map(p.normalize).toSet().toList();
+    watchList.sort();
+
+    final pubCacheDir = pub.pubCacheDir;
+    _LOG.fine('pubCacheDir: [${pubCacheDir.path}]');
+
+    final isDockerized = await isRunningInDockerContainer();
+    _LOG.fine('isDockerized: [$isDockerized]');
+
+    final watchers = <Watcher>[];
+    for (final path in watchList) {
+      if (path.startsWith(pubCacheDir.path)) {
+        _LOG.fine('Skipped watching cached package at: [$path]');
+        continue;
+      }
+      final fileType = io.FileSystemEntity.typeSync(path);
+      if (fileType == io.FileSystemEntityType.file) {
+        watchers.add(isDockerized
+            ? new PollingFileWatcher(path, pollingDelay: _debounceInterval)
+            : new FileWatcher(path));
+      } else if (fileType == io.FileSystemEntityType.notFound) {
+        watchers.add(
+            new PollingDirectoryWatcher(path, pollingDelay: _debounceInterval));
+      } else {
+        watchers.add(isDockerized
+            ? new PollingDirectoryWatcher(path, pollingDelay: _debounceInterval)
+            : new DirectoryWatcher(path));
+      }
+    }
+
+    for (final watcher in watchers) {
+      _LOG.config(
+          'Watching [${watcher.path}] with [${watcher.runtimeType}]...');
+      final watchedStream = watcher.events
+          .debounceBuffer(_debounceInterval)
+          .listen(_onFilesModified);
+      await watcher.ready;
+      _watchedStreams.add(watchedStream);
+    }
+  }
+
+  /**
+   * reloads the code of all isolates
+   */
   Future<HotReloadResult> _reloadCode(
-      {Set<WatchEvent> changes, bool force = false}) async {
+    final List<WatchEvent> changes,
+    final bool force,
+  ) async {
     _LOG.info('Hot-reloading code...');
 
-    final vm = await _vmService.getVM();
+    final packagesFile = await pub.packagesFile;
+    final isPackagesFileChanged = changes?.firstWhereOrNull((c) =>
+            c.path.endsWith('.packages') &&
+            new io.File(c.path).absolute.path == packagesFile.path) !=
+        null;
 
     final reloadReports = <vms.IsolateRef, vms.ReloadReport>{};
     final failedReloadReports = <vms.IsolateRef, vms.ReloadReport>{};
-    for (final isolate in vm.isolates) {
-      _LOG.fine('Hot-reloading code of isolate [${isolate.name}]...');
+    for (final isolateRef in (await _vmService.getVM()).isolates) {
+      _LOG.fine('Hot-reloading code of isolate [${isolateRef.name}]...');
 
       var noVeto = true;
       if (_onBeforeReload != null) {
         if (changes?.isEmpty ?? true) {
-          noVeto = _onBeforeReload.call(new BeforeReloadContext(null, isolate));
+          noVeto =
+              _onBeforeReload.call(new BeforeReloadContext(null, isolateRef));
         } else {
           for (final change in changes) {
             if (!_onBeforeReload
-                .call(new BeforeReloadContext(change, isolate))) {
+                .call(new BeforeReloadContext(change, isolateRef))) {
               noVeto = false;
             }
           }
@@ -151,22 +235,28 @@ class HotReloader {
 
       if (noVeto) {
         try {
-          final reloadReport =
-              await _vmService.reloadSources(isolate.id, force: force);
+          final reloadReport = await _vmService.reloadSources(isolateRef.id,
+              force: force,
+              packagesUri:
+                  isPackagesFileChanged ? packagesFile.uri.toString() : null);
           if (!reloadReport.success) {
-            failedReloadReports[isolate] = reloadReport;
+            failedReloadReports[isolateRef] = reloadReport;
           }
-          reloadReports[isolate] = reloadReport;
-          _LOG.finest('reloadReport for [${isolate.name}]: $reloadReport');
+          reloadReports[isolateRef] = reloadReport;
+          _LOG.finest('reloadReport for [${isolateRef.name}]: $reloadReport');
         } on vms.SentinelException catch (ex) {
           // happens when the isolate has been garbge collected in the meantime
           _LOG.warning(
-              'Failed to reload code of isolate [${isolate.name}]: $ex');
+              'Failed to reload code of isolate [${isolateRef.name}]: $ex');
         }
       } else {
         _LOG.fine(
-            'Skipped hot-reloading code of isolate [${isolate.name}] because of listener veto.');
+            'Skipped hot-reloading code of isolate [${isolateRef.name}] because of listener veto.');
       }
+    }
+
+    if (isPackagesFileChanged) {
+      await _registerWatchers();
     }
 
     if (reloadReports.isEmpty) {
@@ -199,18 +289,18 @@ class HotReloader {
     return HotReloadResult.PartiallySucceeded;
   }
 
-  void _onFilesModified(final List<WatchEvent> changes) {
-    final distinctChanges = changes.toSet();
-
+  Future<void> _onFilesModified(final List<WatchEvent> changes) async {
     // ignore non-dart file changes
-    distinctChanges.retainWhere((ev) => ev.path.endsWith('.dart'));
-    if (distinctChanges.isEmpty) return;
+    final packagesFile = await pub.packagesFile;
+    changes.retainWhere(
+        (ev) => ev.path.endsWith('.dart') || ev.path == packagesFile.path);
+    if (changes.isEmpty) return;
 
-    for (final event in distinctChanges) {
+    for (final event in changes) {
       _LOG.info('Change detected: type=[${event.type}] path=[${event.path}]');
     }
-    _LOG.finest(distinctChanges);
-    _reloadCode(changes: distinctChanges);
+    _LOG.finest(changes);
+    await _reloadCode(changes, false);
   }
 
   bool get isWatching => _watchedStreams.isNotEmpty;
@@ -220,8 +310,8 @@ class HotReloader {
    *
    * @param force: indicates that code from all source files should be reloaded regardless of their modification time.
    */
-  Future<HotReloadResult> reloadCode({bool force = false}) async {
-    return _reloadCode(changes: null, force: force);
+  Future<HotReloadResult> reloadCode({final bool force = false}) async {
+    return _reloadCode(null, force);
   }
 
   /**
@@ -233,7 +323,7 @@ class HotReloader {
       await Future.wait<dynamic>(_watchedStreams.map((s) => s.cancel()));
       _watchedStreams.clear();
     } else {
-      _LOG.info('Was not watching any paths.');
+      _LOG.fine('Was not watching any paths.');
     }
   }
 }
