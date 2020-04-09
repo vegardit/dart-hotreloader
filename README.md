@@ -31,7 +31,7 @@ and automatically applies them using the Dart VM's [hot reload](https://github.c
 
    ```yaml
    dev_dependencies:
-     hotreloader: ^1.0.0
+     hotreloader: ^2.0.0
    ```
 
 1. Enable hot reloading in your entry point dart file, e.g. `bin/main.dart`
