@@ -16,7 +16,7 @@
 
 ## <a name="what-is-it"></a>What is it?
 
-This [Dart](https://dart.dev) library provides a code reloading service that monitors the local file system for changes to a Dart project's source files
+This [Dart](https://dart.dev) library provides a code reloading service that monitors the source files of a Dart project on the local file system for changes
 and automatically applies them using the Dart VM's [hot reload](https://github.com/dart-lang/sdk/wiki/Hot-reload) capabilities to the running Dart process.
 
 
@@ -27,7 +27,7 @@ and automatically applies them using the Dart VM's [hot reload](https://github.c
 
 ## <a name="how-to-use"></a>How to use
 
-1. Add this to your pubspec.yml
+1. Add this to your `pubspec.yaml`
 
    ```yaml
    dev_dependencies:
@@ -41,7 +41,7 @@ and automatically applies them using the Dart VM's [hot reload](https://github.c
 
    Future<void> main(List<String> args) async {
 
-     // instantiate a reloader that by default monitors the lib directory for source file changes
+     // instantiate a reloader that by monitors the project's source code folders for changes
      final reloader = await HotReloader.create();
 
      // ... your other code
