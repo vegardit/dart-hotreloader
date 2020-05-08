@@ -3,8 +3,9 @@ language: dart
 
 dart:
   - stable
-  - 2.7.0
-  - 2.6.0
+  - 2.8.1
+  - 2.7.2
+  - 2.6.1
 
 os:
   - linux
