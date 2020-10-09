@@ -5,6 +5,7 @@
  * @author Sebastian Thomschke, Vegard IT GmbH
  */
 import 'dart:async';
+import 'dart:convert' as convert;
 import 'dart:io' as io;
 import 'dart:isolate' as isolates;
 
@@ -150,11 +151,19 @@ For hot code reloading to function properly, Dart needs to be run from the root 
       // add .packages file to watch list
       watchList.add((await pub.packagesFile).path);
       // add source folders of all dependencies to watch list
-      await (await isolates.Isolate.packageConfig)
-          .readLineByLine()
+      final pkgConfigURL = await isolates.Isolate.packageConfig;
+      if (pkgConfigURL.path.endsWith('.json')) {
+        convert.json.decode(
+          await new io.File(pkgConfigURL.toFilePath()).readAsString()
+        )['packages']
+          .map((dynamic v) => Uri.parse(v['rootUri'].toString()).toFilePath())
+          .forEach(watchList.add);
+      } else {
+        await pkgConfigURL.readLineByLine()
           .where((l) => !l.startsWith('#') && l.contains(':'))
           .map((l) => Uri.parse(strings.substringAfter(l, ':')).toFilePath())
           .forEach(watchList.add);
+      }
     }
 
     watchList = watchList.map(p.absolute).map(p.normalize).toSet().toList();
