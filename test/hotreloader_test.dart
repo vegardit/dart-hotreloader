@@ -15,8 +15,7 @@ import 'reloadable.dart' as reloadable;
 
 final _LOG = new logging.Logger('hotreloader.test');
 
-Future<void> _writeReloadableDartFile(
-    [String content = 'String testfunc() => \'foo\';']) async {
+Future<void> _writeReloadableDartFile([String content = "String testfunc() => 'foo';"]) async {
   // waiting for two seconds so that the modification timestamp will be different on
   // filesystems with seconds-only precision
   await Future<void>.delayed(const Duration(seconds: 2));
@@ -44,8 +43,9 @@ Future<void> _writeReloadableDartFile(
  */
 Future<void> main() async {
   logging.hierarchicalLoggingEnabled = true;
-  logging.Logger.root.onRecord.listen((record) => print(// ignore: avoid_print
-      '${record.time} ${record.level.name} [${Isolate.current.debugName}] ${record.loggerName}: ${record.message}'));
+  logging.Logger.root.onRecord.listen((record) => print( // ignore: avoid_print
+    '${record.time} ${record.level.name} [${Isolate.current.debugName}] ${record.loggerName}: ${record.message}')
+  );
 
   HotReloader.logLevel = logging.Level.FINEST;
 
@@ -62,6 +62,7 @@ Future<void> test_programmatic_reload() async {
   var callbacksTriggered = 0;
   final hotreloader = await HotReloader.create(
     automaticReload: false,
+    // ignore: avoid_redundant_argument_values
     debounceInterval: const Duration(seconds: 0), //
     onBeforeReload: (ctx) {
       callbacksTriggered++;
@@ -74,7 +75,7 @@ Future<void> test_programmatic_reload() async {
 
   try {
     assert(reloadable.testfunc() == 'foo');
-    await _writeReloadableDartFile('String testfunc() => \'bar\';');
+    await _writeReloadableDartFile("String testfunc() => 'bar';");
 
     // perform programmatic code reload
     assert(await hotreloader.reloadCode() == HotReloadResult.Succeeded);
@@ -95,6 +96,7 @@ Future<void> test_automatic_reload() async {
 
   final reloaded = new Completer<void>();
   final hotreloader = await HotReloader.create(
+    // ignore: avoid_redundant_argument_values
     debounceInterval: const Duration(seconds: 0), //
     onAfterReload: (ctx) {
       if (!reloaded.isCompleted) reloaded.complete();
@@ -103,7 +105,7 @@ Future<void> test_automatic_reload() async {
 
   try {
     assert(reloadable.testfunc() == 'foo');
-    await _writeReloadableDartFile('String testfunc() => \'bar\';');
+    await _writeReloadableDartFile("String testfunc() => 'bar';");
 
     // wait for automatic code reload
     await reloaded.future;

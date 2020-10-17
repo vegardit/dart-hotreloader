@@ -11,8 +11,7 @@ import 'dart:isolate' as isolates;
 
 import 'package:logging/logging.dart' as logging;
 import 'package:path/path.dart' as p;
-import 'package:stream_transform/stream_transform.dart'
-    show RateLimit; // debounceBuffer
+import 'package:stream_transform/stream_transform.dart' show RateLimit; // debounceBuffer
 import 'package:vm_service/vm_service.dart' as vms;
 import 'package:watcher/watcher.dart';
 
@@ -100,7 +99,8 @@ class HotReloader {
   }) async {
     if (!new io.File('pubspec.yaml').existsSync()) {
       throw StateError(
-          '''Error: [pubspec.yaml] file not found in current directory.
+'''
+Error: [pubspec.yaml] file not found in current directory.
 For hot code reloading to function properly, Dart needs to be run from the root of your project.''');
     }
 
