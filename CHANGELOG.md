@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 2020-10-19
+- support version 5.x of vm_service library
+
+
 ## [2.0.1] - 2020-10-18
 
 ## Fixed
