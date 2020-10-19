@@ -1,6 +1,6 @@
 # https://dart.dev/tools/pub/pubspec
 name: hotreloader
-version: 2.0.1
+version: 2.0.2-SNAPSHOT
 
 description: Automatic hot code reloader for Dart projects.
 
@@ -15,11 +15,11 @@ environment:
 
 # https://dart.dev/tools/pub/dependencies#version-constraints
 dependencies:
-  logging: ^0.11.3+2       # https://pub.dev/packages/logging
-  path: ^1.6.3             # https://pub.dev/packages/path
-  stream_transform: ^1.0.0 # https://pub.dev/packages/stream_transform
-  vm_service: ^4.0.0       # https://pub.dev/packages/vm_service
-  watcher: ^0.9.7+10       # https://pub.dev/packages/watcher
+  logging: ^0.11.3+2           # https://pub.dev/packages/logging
+  path: ^1.6.3                 # https://pub.dev/packages/path
+  stream_transform: ^1.0.0     # https://pub.dev/packages/stream_transform
+  vm_service: '>=4.0.0 <6.0.0' # https://pub.dev/packages/vm_service
+  watcher: ^0.9.7+10           # https://pub.dev/packages/watcher
 
 dev_dependencies:
   lint: ^1.0.0
