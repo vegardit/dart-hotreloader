@@ -11,9 +11,14 @@ if [ "$1" == "--help" ]; then
    exit 0
 fi
 
-dartanalyzer \
-  --lints \
-  --fatal-warnings \
-  --options $(dirname $0)/../analysis_options.yaml \
-  $(dirname $0)/../lib \
-  $(dirname $0)/../test
+if dart analyze --help 2>/dev/null; then
+   dart analyze --fatal-warnings $(dirname $0)/../lib
+   dart analyze --fatal-warnings $(dirname $0)/../test
+else
+   dartanalyzer \
+      --lints \
+      --fatal-warnings \
+      --options $(dirname $0)/../analysis_options.yaml \
+      $(dirname $0)/../lib \
+      $(dirname $0)/../test
+fi

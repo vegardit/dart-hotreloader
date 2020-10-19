@@ -10,8 +10,8 @@ set -o pipefail # causes a pipeline to return the exit status of the last comman
 set -o nounset # treat undefined variables as errors
 
 if [[ -f .ci/release-trigger.sh ]]; then
-    echo "Sourcing [.ci/release-trigger.sh]..."
-    source .ci/release-trigger.sh
+   echo "Sourcing [.ci/release-trigger.sh]..."
+   source .ci/release-trigger.sh
 fi
 
 cd $(dirname $0)/..
@@ -31,13 +31,23 @@ bash tool/checkstyle.sh
 echo "|---------------------------------------------------------|"
 echo "| Running tests with minimum versions of dependencies...  |"
 echo "|---------------------------------------------------------|"
-pub downgrade
+if dart pub --help 2>/dev/null; then
+   # dart 2.10+ SDK
+   dart pub downgrade
+else
+   pub downgrade
+fi
 bash tool/test.sh
 
 echo "|---------------------------------------------------------|"
 echo "| Running tests with maximum versions of dependencies...  |"
 echo "|---------------------------------------------------------|"
-pub upgrade
+if dart pub --help 2>/dev/null; then
+   # dart 2.10+ SDK
+   dart pub upgrade
+else
+   pub upgrade
+fi
 bash tool/test.sh
 
 #
@@ -52,13 +62,14 @@ if [[ ${MAY_CREATE_RELEASE:-false} = "true" && ${projectVersion:-foo} == ${RELEA
 {
   "accessToken":"$PUBDEV_ACCESS_TOKEN",
   "refreshToken":"$PUBDEV_REFRESH_TOKEN",
+  "idToken":"$PUBDEV_ID_TOKEN",
   "tokenEndpoint":"https://accounts.google.com/o/oauth2/token",
   "scopes":["https://www.googleapis.com/auth/userinfo.email","openid"],
   "expiration":$PUBDEV_TOKEN_EXPIRATION
 }
 EOF
 
-   pub publish --dry-run
+   dart pub publish --dry-run
 
    git tag $RELEASE_VERSION
 
@@ -69,7 +80,7 @@ EOF
       echo "$exclude" >> .gitignore
    done
 
-   pub publish --force
+   dart pub publish --force
 
    # restore files
    git reset --hard

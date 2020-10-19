@@ -7,12 +7,8 @@
 if "%1" == "--help" goto :display_help
 if "%1" == "/?" goto :display_help
 
-call dartanalyzer ^
-  --lints ^
-  --fatal-warnings ^
-  --options %~dp0..\analysis_options.yaml ^
-  %~dp0..\lib ^
-  %~dp0..\test
+dart analyze --fatal-warnings %~dp0..\lib
+dart analyze --fatal-warnings %~dp0..\test
 goto :eof
 
 
