@@ -2,7 +2,9 @@
 name: hotreloader
 version: 2.0.2-SNAPSHOT
 
-description: Automatic hot code reloader for Dart projects.
+description: >
+  Automatic hot code reloader for Dart projects that monitors the source files of a Dart
+  project for changes and automatically applies them to the running Dart process.
 
 repository: https://github.com/vegardit/dart-hotreloader
 homepage: https://github.com/vegardit/dart-hotreloader
