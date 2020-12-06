@@ -16,6 +16,22 @@ fi
 
 cd $(dirname $0)/..
 
+echo
+echo "###################################################"
+echo "# Determining GIT branch......                    #"
+echo "###################################################"
+if [[ $CI == "true" && ${TRAVIS:-false} == "true" && $USER == "travis" ]]; then
+   # https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
+   if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then
+      GIT_BRANCH="$TRAVIS_BRANCH"
+   else
+      GIT_BRANCH="$TRAVIS_PULL_REQUEST_BRANCH"
+   fi
+else
+   GIT_BRANCH=$(git branch --show-current)
+fi
+echo "  -> GIT Branch: $GIT_BRANCH"; echo
+
 echo "###########################################################"
 echo "# Testing Dart Library Package...                         #"
 echo "###########################################################"
@@ -23,15 +39,24 @@ echo " -> GIT Branch: $GIT_BRANCH"
 projectVersion="$(grep "version: " pubspec.yaml | cut -f2 -d" ")"
 echo " -> Current Version: $projectVersion"
 
+if dart pub --help &>/dev/null; then
+   # dart 2.10+ SDK
+   dart pub get
+else
+   pub get
+fi
+
+
 echo "|---------------------------------------------------------|"
 echo "| Checking source code style...                           |"
 echo "|---------------------------------------------------------|"
 bash tool/checkstyle.sh
 
+
 echo "|---------------------------------------------------------|"
 echo "| Running tests with minimum versions of dependencies...  |"
 echo "|---------------------------------------------------------|"
-if dart pub --help 2>/dev/null; then
+if dart pub --help &>/dev/null; then
    # dart 2.10+ SDK
    dart pub downgrade
 else
@@ -39,10 +64,11 @@ else
 fi
 bash tool/test.sh
 
+
 echo "|---------------------------------------------------------|"
 echo "| Running tests with maximum versions of dependencies...  |"
 echo "|---------------------------------------------------------|"
-if dart pub --help 2>/dev/null; then
+if dart pub --help &>/dev/null; then
    # dart 2.10+ SDK
    dart pub upgrade
 else

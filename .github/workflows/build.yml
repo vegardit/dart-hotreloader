@@ -1,0 +1,62 @@
+# https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions
+name: Build
+
+on:
+  push:
+    paths-ignore:
+    - '**/*.md'
+  workflow_dispatch:
+    # https://github.blog/changelog/2020-07-06-github-actions-manual-triggers-with-workflow_dispatch/
+
+env:
+  TRIVY_CACHE_DIR: ~/.trivy/cache
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        DART_VERSION: 
+          - latest
+          - 2.10.4
+          - 2.9.3
+          - 2.8.4
+          - 2.7.0
+          - 2.6.1
+        OS:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+
+    steps:
+    - name: Git Checkout
+      uses: actions/checkout@v2 #https://github.com/actions/checkout
+
+    - uses: cedx/setup-dart@v2
+      with:
+        version: ${{ matrix.DART_VERSION }}
+
+    - name: Cache Dart Pub
+      uses: actions/cache@v2
+      with:
+        path: ~/.pub-cache
+        key: ${{ runner.os }}-dartpub-${{ hashFiles('**/pubspec.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-dartpub-
+
+    - name: Build
+      shell: bash
+      run: |
+        # set MAY_CREATE_RELEASE variable used by build.sh
+        if [ "${{ matrix.DART_VERSION }}" == "latest" ] && [ "${{ matrix.OS }}" == "ubuntu-latest" ] && [[ $GITHUB_REF == */master ]]; then
+           export MAY_CREATE_RELEASE=true
+           # configure read-write GIT credentials
+           git config credential.helper "store --file=.git/credentials"
+          echo "https://${{ secrets.GH_API_TOKEN }}:@github.com" > .git/credentials 2>/dev/null
+        else
+           export MAY_CREATE_RELEASE=false
+        fi
+
+        bash .ci/build.sh

@@ -1,6 +1,6 @@
 # hotreloader (Dart)
 
-[![Build Status](https://travis-ci.com/vegardit/dart-hotreloader.svg?branch=master "Travis CI")](https://travis-ci.com/vegardit/dart-hotreloader)
+[![Build Status](https://github.com/vegardit/dart-hotreloader/workflows/Build/badge.svg "GitHub Actions")](https://github.com/vegardit/dart-hotreloader/actions?query=workflow%3ABuild)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE.txt)
 [![Pub Package](https://img.shields.io/pub/v/hotreloader.svg)](https://pub.dev/packages/hotreloader)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
