@@ -59,4 +59,8 @@ jobs:
            export MAY_CREATE_RELEASE=false
         fi
 
+        # https://github.community/t/github-actions-bot-email-address/17204
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
         bash .ci/build.sh
