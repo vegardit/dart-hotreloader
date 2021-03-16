@@ -47,7 +47,12 @@ jobs:
            export MAY_CREATE_RELEASE=true
            # configure read-write GIT credentials
            git config credential.helper "store --file=.git/credentials"
-          echo "https://${{ secrets.GH_API_TOKEN }}:@github.com" > .git/credentials 2>/dev/null
+           echo "https://${{ secrets.GH_API_TOKEN }}:@github.com" > .git/credentials 2>/dev/null
+           
+           export PUBDEV_ACCESS_TOKEN="${{ secrets.PUBDEV_ACCESS_TOKEN }}"
+           export PUBDEV_REFRESH_TOKEN="${{ secrets.PUBDEV_REFRESH_TOKEN }}"
+           export PUBDEV_ID_TOKEN="${{ secrets.PUBDEV_ID_TOKEN }}"
+           export PUBDEV_TOKEN_EXPIRATION="${{ secrets.PUBDEV_TOKEN_EXPIRATION }}"
         else
            export MAY_CREATE_RELEASE=false
         fi

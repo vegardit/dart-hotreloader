@@ -22,7 +22,9 @@ and automatically applies them using the Dart VM's [hot reload](https://github.c
 
 ## <a name="requirements"></a>Requirements
 
-[Dart SDK](https://dart.dev/get-dart) **2.6.0** or higher.
+hotreloader 1.x-2.x requires [Dart SDK](https://dart.dev/get-dart) **2.6.0** or higher.
+
+hotreloader 3.x requires [Dart SDK](https://dart.dev/get-dart) **2.12.0** or higher.
 
 
 ## <a name="how-to-use"></a>How to use
@@ -31,7 +33,7 @@ and automatically applies them using the Dart VM's [hot reload](https://github.c
 
    ```yaml
    dev_dependencies:
-     hotreloader: ^2.0.0
+     hotreloader: ^3.0.0
    ```
 
 1. Enable hot reloading in your entry point dart file, e.g. `bin/main.dart`
@@ -68,7 +70,7 @@ Future<void> main(List<String> args) async {
 
   final reloader = await HotReloader.create(
     debounceInterval: Duration(seconds: 2), // wait up to 2 seconds after file change before reloading
-    onBeforeReload: (ctx) => //
+    onBeforeReload: (ctx) =>
       ctx.isolate.name != 'foobar' && // never reload the isolate named 'foobar'
       ctx.event?.path.contains('/mymodel/')) ?? true, // only perform reload when dart files under ../mymodel/ are changed
     onAfterReload: (ctx) => print('Hot-reload result: ${ctx.result}')
@@ -121,10 +123,10 @@ Future<void> main() async {
 
 ## <a name="alternatives"></a>Alternatives
 
-- https://pub.dev/packages/angel_hot
-- https://pub.dev/packages/jaguar_hotreload
-- https://pub.dev/packages/recharge
-- https://pub.dev/packages/reloader
+- https://pub.dev/packages/angel_hot (last update 05/2019)
+- https://pub.dev/packages/jaguar_hotreload (last update 02/2019)
+- https://pub.dev/packages/recharge (last update 02/2020)
+- https://pub.dev/packages/reloader (last update 01/2019)
 
 
 ## <a name="changelog"></a>Changelog / Version History

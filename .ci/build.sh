@@ -39,12 +39,7 @@ echo " -> GIT Branch: $GIT_BRANCH"
 projectVersion="$(grep "version: " pubspec.yaml | cut -f2 -d" ")"
 echo " -> Current Version: $projectVersion"
 
-if dart pub --help &>/dev/null; then
-   # dart 2.10+ SDK
-   dart pub get
-else
-   pub get
-fi
+dart pub get
 
 
 echo "|---------------------------------------------------------|"
@@ -56,24 +51,14 @@ bash tool/checkstyle.sh
 echo "|---------------------------------------------------------|"
 echo "| Running tests with minimum versions of dependencies...  |"
 echo "|---------------------------------------------------------|"
-if dart pub --help &>/dev/null; then
-   # dart 2.10+ SDK
-   dart pub downgrade
-else
-   pub downgrade
-fi
+dart pub downgrade
 bash tool/test.sh
 
 
 echo "|---------------------------------------------------------|"
 echo "| Running tests with maximum versions of dependencies...  |"
 echo "|---------------------------------------------------------|"
-if dart pub --help &>/dev/null; then
-   # dart 2.10+ SDK
-   dart pub upgrade
-else
-   pub upgrade
-fi
+dart pub upgrade
 bash tool/test.sh
 
 #
@@ -101,7 +86,7 @@ EOF
 
    # as workaround for https://dart.dev/tools/pub/publishing#what-files-are-published
    # we temporarily remove files from the index we don't want to be part of the published package
-   for exclude in .ci .travis.yml test tool; do
+   for exclude in .ci .github test tool; do
       git rm -r --cached $exclude
       echo "$exclude" >> .gitignore
    done
