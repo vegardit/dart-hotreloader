@@ -6,7 +6,7 @@
  */
 
 String substringAfter(final String searchIn, final String searchFor) {
-  if (searchIn?.isEmpty ?? true) {
+  if (searchIn.isEmpty) {
     return searchIn;
   }
 

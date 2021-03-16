@@ -43,9 +43,9 @@ Future<void> _writeReloadableDartFile([String content = "String testfunc() => 'f
  */
 Future<void> main() async {
   logging.hierarchicalLoggingEnabled = true;
-  logging.Logger.root.onRecord.listen((record) => print( // ignore: avoid_print
-    '${record.time} ${record.level.name} [${Isolate.current.debugName}] ${record.loggerName}: ${record.message}')
-  );
+  logging.Logger.root.onRecord.listen((record) => print(// ignore: avoid_print
+      '${record.time} ${record.level.name} [${Isolate.current.debugName}] ${record.loggerName}: ${record.message}' //
+      ));
 
   HotReloader.logLevel = logging.Level.FINEST;
 

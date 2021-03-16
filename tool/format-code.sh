@@ -5,11 +5,11 @@
 # @author Sebastian Thomschke, Vegard IT GmbH
 
 if [ "$1" == "--help" ]; then
-   echo "Checks the source code against coding guidelines."
+   echo "Formats the source code."
    echo
    echo "Usage: $(basename $0)"
    exit 0
 fi
 
-dart analyze --fatal-warnings $(dirname $0)/../lib
-dart analyze --fatal-warnings $(dirname $0)/../test
+dart format --line-length 120 $(dirname $0)/../lib
+dart format --line-length 120 $(dirname $0)/../test

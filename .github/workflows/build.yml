@@ -18,11 +18,6 @@ jobs:
         DART_VERSION: 
           - latest
           - 2.12.1
-          - 2.10.5
-          - 2.9.3
-          - 2.8.4
-          - 2.7.0
-          - 2.6.1
         OS:
           - ubuntu-latest
           - macos-latest

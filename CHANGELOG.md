@@ -8,7 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2021-03-??
+
+### Added
+- enable null safety support
+
+### Changed
+- require Dart 2.12.0 for null safety support
+- upgrade dependencies:
+  - logging 1.0.0
+  - path 1.8.0
+  - stream_transform 2.0.0
+  - vm_service 6.1.0+1
+  - watcher 1.0.0
+
+
 ## [2.0.2] - 2020-10-19
+
+### Added
 - support version 5.x of vm_service library
 
 

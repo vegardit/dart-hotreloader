@@ -14,15 +14,15 @@ extension FileExtensions on io.File {
       return const Stream<String>.empty();
     }
 
-    return openRead()
-        .transform(convert.utf8.decoder)
+    return openRead() //
+        .transform(convert.utf8.decoder) //
         .transform(const convert.LineSplitter());
   }
 }
 
 extension UriExtensions on Uri {
   Stream<String> readLineByLine() {
-    final file = new io.File(toFilePath());
-    return file.readLineByLine();
+    return new io.File(toFilePath()) //
+        .readLineByLine();
   }
 }
