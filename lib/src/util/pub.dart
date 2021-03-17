@@ -8,29 +8,19 @@ import 'dart:io' as io;
 import 'dart:isolate' as isolate;
 import 'package:path/path.dart' as p;
 
-late final io.File _packagesFile;
-bool _packagesFileInitialized = false;
-Future<io.File> get packagesFile async {
-  if (!_packagesFileInitialized) {
-    final path = (await isolate.Isolate.packageConfig)?.toFilePath() ?? '.packages';
-    _packagesFile = new io.File(path).absolute;
-    _packagesFileInitialized = true;
-  }
-  return _packagesFile;
+Future<io.File> _getPackagesFile() async {
+  final path = (await isolate.Isolate.packageConfig)?.toFilePath() ?? '.packages';
+  return new io.File(path).absolute;
 }
+late final Future<io.File> packagesFile = _getPackagesFile();
 
-late final io.Directory _pubCacheDir;
-bool _pubCacheDirInitialized = false;
-io.Directory get pubCacheDir {
-  if (!_pubCacheDirInitialized) {
-    final env = io.Platform.environment;
-    final path = env['PUB_CACHE'] ??
-        (io.Platform.isWindows //
-            ? '${env['APPDATA']}\\Pub\\Cache' //
-            : '${env['HOME']}/.pub-cache' //
-        );
-    _pubCacheDir = new io.Directory(p.normalize(path)).absolute;
-    _pubCacheDirInitialized = true;
-  }
-  return _pubCacheDir;
+io.Directory _getPubCacheDir() {
+  final env = io.Platform.environment;
+  final path = env['PUB_CACHE'] ??
+      (io.Platform.isWindows //
+          ? '${env['APPDATA']}\\Pub\\Cache' //
+          : '${env['HOME']}/.pub-cache' //
+      );
+  return new io.Directory(p.normalize(path)).absolute;
 }
+late final io.Directory pubCacheDir = _getPubCacheDir();

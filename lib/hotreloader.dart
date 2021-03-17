@@ -16,7 +16,7 @@ import 'package:stream_transform/stream_transform.dart' show RateLimit; // debou
 import 'package:vm_service/vm_service.dart' as vms;
 import 'package:watcher/watcher.dart';
 
-import 'src/util/docker.dart' show isRunningInDockerContainer;
+import 'src/util/docker.dart' as docker;
 import 'src/util/files.dart' show UriExtensions;
 import 'src/util/pub.dart' as pub;
 import 'src/util/strings.dart' as strings;
@@ -103,7 +103,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     final instance = new HotReloader._(
       watchDependencies,
       debounceInterval,
-      await vm_utils.getVmService(),
+      await vm_utils.vmService,
       onBeforeReload,
       onAfterReload,
     );
@@ -170,7 +170,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     final pubCacheDir = pub.pubCacheDir;
     _LOG.fine('pubCacheDir: [${pubCacheDir.path}]');
 
-    final isDockerized = await isRunningInDockerContainer();
+    final isDockerized = await docker.isRunningInDockerContainer;
     _LOG.fine('isDockerized: [$isDockerized]');
 
     final watchers = <Watcher>[];

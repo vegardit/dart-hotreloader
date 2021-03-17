@@ -10,22 +10,15 @@ import 'package:vm_service/utils.dart' as vms_utils;
 import 'package:vm_service/vm_service.dart' as vms;
 import 'package:vm_service/vm_service_io.dart' as vms_io;
 
-late final vms.VmService _vmService;
-bool _vmServiceInitialized = false;
-
 /**
  * @throws StateError if VM service is not available
  */
-Future<vms.VmService> getVmService() async {
-  if (!_vmServiceInitialized) {
-    final devServiceURL = (await dev.Service.getInfo()).serverUri;
-    if (devServiceURL == null) {
-      throw new StateError('VM service not available! You need to run dart with --enable-vm-service.');
-    }
-    final wsURL = vms_utils.convertToWebSocketUrl(serviceProtocolUrl: devServiceURL);
-
-    _vmService = await vms_io.vmServiceConnectUri(wsURL.toString());
-    _vmServiceInitialized = true;
+Future<vms.VmService> _getVmService() async {
+  final devServiceURL = (await dev.Service.getInfo()).serverUri;
+  if (devServiceURL == null) {
+    throw new StateError('VM service not available! You need to run dart with --enable-vm-service.');
   }
-  return _vmService;
+  final wsURL = vms_utils.convertToWebSocketUrl(serviceProtocolUrl: devServiceURL);
+  return await vms_io.vmServiceConnectUri(wsURL.toString());
 }
+late final Future<vms.VmService> vmService = _getVmService();

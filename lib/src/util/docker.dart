@@ -7,24 +7,20 @@
 import 'dart:convert' as convert;
 import 'dart:io';
 
-bool? _isRunningInDockerContainer;
+late final Future<bool> isRunningInDockerContainer = _isRunningInDockerContainer();
 
 /**
  * @return true if the program is running within a docker container
  */
-Future<bool> isRunningInDockerContainer() async {
-  if (_isRunningInDockerContainer == null) {
-    final cgroup = new File('/proc/1/cgroup');
-    if (!cgroup.existsSync()) {
-      _isRunningInDockerContainer = false;
-    } else {
-      _isRunningInDockerContainer = '' !=
-          await cgroup
-              .openRead()
-              .transform(convert.utf8.decoder)
-              .transform(const convert.LineSplitter())
-              .firstWhere((l) => l.contains('/docker'), orElse: () => '');
-    }
+Future<bool> _isRunningInDockerContainer() async {
+  final cgroup = new File('/proc/1/cgroup');
+  if (!cgroup.existsSync()) {
+    return false;
   }
-  return _isRunningInDockerContainer ?? false;
+  return '' !=
+    await cgroup
+        .openRead()
+        .transform(convert.utf8.decoder)
+        .transform(const convert.LineSplitter())
+        .firstWhere((l) => l.contains('/docker'), orElse: () => '');
 }
