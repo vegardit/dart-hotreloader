@@ -14,7 +14,7 @@ late final Future<bool> isRunningInDockerContainer = _isRunningInDockerContainer
  */
 Future<bool> _isRunningInDockerContainer() async {
   final cgroup = new File('/proc/1/cgroup');
-  if (!cgroup.existsSync()) {
+  if (!await cgroup.exists()) {
     return false;
   }
   return '' !=

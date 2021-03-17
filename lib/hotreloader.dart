@@ -94,7 +94,7 @@ class HotReloader {
     final bool Function(BeforeReloadContext ctx)? onBeforeReload,
     final void Function(AfterReloadContext ctx)? onAfterReload,
   }) async {
-    if (!new io.File('pubspec.yaml').existsSync()) {
+    if (!await new io.File('pubspec.yaml').exists()) {
       throw StateError('''
 Error: [pubspec.yaml] file not found in current directory.
 For hot code reloading to function properly, Dart needs to be run from the root of your project.''');
@@ -179,7 +179,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
         _LOG.fine('Skipped watching cached package at: [$path]');
         continue;
       }
-      final fileType = io.FileSystemEntity.typeSync(path);
+      final fileType = await io.FileSystemEntity.type(path);
       if (fileType == io.FileSystemEntityType.file) {
         watchers.add(isDockerized //
                 ? new PollingFileWatcher(path, pollingDelay: _debounceInterval) //

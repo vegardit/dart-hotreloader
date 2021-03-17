@@ -21,7 +21,7 @@ Future<void> _writeReloadableDartFile([String content = "String testfunc() => 'f
   await Future<void>.delayed(const Duration(seconds: 2));
   final dartFile = new io.File('test/reloadable.dart');
   _LOG.info('Writing to [${dartFile.path}]: $content');
-  dartFile.writeAsStringSync(content, flush: true);
+  await dartFile.writeAsString(content, flush: true);
 }
 
 /* cannot use "pub run test" with hot reload as it results in:
