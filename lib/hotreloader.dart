@@ -149,10 +149,16 @@ For hot code reloading to function properly, Dart needs to be run from the root 
       // add source folders of all dependencies to watch list
       final pkgConfigURL = await isolates.Isolate.packageConfig;
       if (pkgConfigURL != null) {
+        _LOG.config('pkgConfigURL: $pkgConfigURL');
         if (pkgConfigURL.path.endsWith('.json')) {
           convert.json
               .decode(await new io.File(pkgConfigURL.toFilePath()).readAsString())['packages']
-              .map((dynamic v) => Uri.parse(v['rootUri'].toString()).toFilePath())
+              .map((dynamic v) => v['rootUri'])
+
+              // the ../ means relative to <project>/.dart_tool
+              // since we are at <project> level we change "../" to "./"
+              .map((rootUri) => rootUri.startsWith("../") ? rootUri.substring(1) : rootUri)
+              .map((rootUri) => Uri.parse(rootUri).toFilePath())
               .forEach(watchList.add);
         } else {
           await pkgConfigURL
@@ -176,9 +182,14 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     final watchers = <Watcher>[];
     for (final path in watchList) {
       if (path.startsWith(pubCacheDir.path)) {
-        _LOG.fine('Skipped watching cached package at: [$path]');
+        _LOG.fine('Skipped watching cached package at [$path]');
         continue;
       }
+      if (watchers.where((w) => path.startsWith(w.path)).length > 0) {
+        _LOG.fine('Skipped watching [$path] since parent path is already being watched');
+        continue;
+      }
+
       final fileType = await io.FileSystemEntity.type(path);
       if (fileType == io.FileSystemEntityType.file) {
         watchers.add(isDockerized //

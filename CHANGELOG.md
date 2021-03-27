@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- improve file watching
+- replace some sync calls with async calls
+
+
 ## [3.0.0] - 2021-03-16
 
 ### Added
