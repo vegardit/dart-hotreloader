@@ -18,9 +18,9 @@ Future<bool> _isRunningInDockerContainer() async {
     return false;
   }
   return '' !=
-    await cgroup
-        .openRead()
-        .transform(convert.utf8.decoder)
-        .transform(const convert.LineSplitter())
-        .firstWhere((l) => l.contains('/docker'), orElse: () => '');
+      await cgroup
+          .openRead()
+          .transform(convert.utf8.decoder)
+          .transform(const convert.LineSplitter())
+          .firstWhere((l) => l.contains('/docker'), orElse: () => '');
 }

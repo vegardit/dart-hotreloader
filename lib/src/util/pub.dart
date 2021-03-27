@@ -12,6 +12,7 @@ Future<io.File> _getPackagesFile() async {
   final path = (await isolate.Isolate.packageConfig)?.toFilePath() ?? '.packages';
   return new io.File(path).absolute;
 }
+
 late final Future<io.File> packagesFile = _getPackagesFile();
 
 io.Directory _getPubCacheDir() {
@@ -23,4 +24,5 @@ io.Directory _getPubCacheDir() {
       );
   return new io.Directory(p.normalize(path)).absolute;
 }
+
 late final io.Directory pubCacheDir = _getPubCacheDir();

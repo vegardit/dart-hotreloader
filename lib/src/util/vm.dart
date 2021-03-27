@@ -21,4 +21,5 @@ Future<vms.VmService> _getVmService() async {
   final wsURL = vms_utils.convertToWebSocketUrl(serviceProtocolUrl: devServiceURL);
   return await vms_io.vmServiceConnectUri(wsURL.toString());
 }
+
 late final Future<vms.VmService> vmService = _getVmService();
