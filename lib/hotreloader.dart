@@ -84,8 +84,6 @@ class HotReloader {
    * @param automaticReload if false reload must be triggered manually via HotReloader#reloadCode()
    * @param debounceInterval file changes within this time frame only trigger a single hot reload
    * @param watchDependencies indicates that changes to library dependencies should also trigger hot reload
-   *
-   * @throws ArgumentError if [paths] is null or empty
    */
   static Future<HotReloader> create({
     final bool automaticReload = true,
