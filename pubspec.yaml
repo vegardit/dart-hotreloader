@@ -6,23 +6,23 @@ description: >
   Automatic hot code reloader for Dart projects that monitors the source files of a Dart
   project for changes and automatically applies them to the running Dart process.
 
-repository: https://github.com/vegardit/dart-hotreloader
+repository: https://github.com/vegardit/dart-hotreloader.git
 homepage: https://github.com/vegardit/dart-hotreloader
 documentation: https://github.com/vegardit/dart-hotreloader/blob/master/README.md
 issue_tracker: https://github.com/vegardit/dart-hotreloader/issues
 
 environment:
   # https://dart.dev/tools/pub/pubspec#sdk-constraints
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ^2.12.0
 
 # https://dart.dev/tools/pub/dependencies#version-constraints
 dependencies:
-  collection:       '>=1.15.0  <2.0.0' # https://pub.dev/packages/collection
-  logging:          '>=1.0.0   <2.0.0' # https://pub.dev/packages/logging
-  path:             '>=1.8.0   <2.0.0' # https://pub.dev/packages/path
-  stream_transform: '>=2.0.0   <3.0.0' # https://pub.dev/packages/stream_transform
-  vm_service:       '>=6.0.1   <7.0.0' # https://pub.dev/packages/vm_service
-  watcher:          '>=1.0.0   <2.0.0' # https://pub.dev/packages/watcher
+  collection:       ^1.15.0 # https://pub.dev/packages/collection
+  logging:          ^1.0.0  # https://pub.dev/packages/logging
+  path:             ^1.8.0  # https://pub.dev/packages/path
+  stream_transform: ^2.0.0  # https://pub.dev/packages/stream_transform
+  vm_service:       ^6.0.1  # https://pub.dev/packages/vm_service
+  watcher:          ^1.0.0  # https://pub.dev/packages/watcher
 
 dev_dependencies:
-  lint: ^1.0.0
+  lint: ^1.5.3
