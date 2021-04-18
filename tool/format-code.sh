@@ -11,5 +11,7 @@ if [ "$1" == "--help" ]; then
    exit 0
 fi
 
+set -eux
+
 dart format --line-length 120 $(dirname $0)/../lib
 dart format --line-length 120 $(dirname $0)/../test

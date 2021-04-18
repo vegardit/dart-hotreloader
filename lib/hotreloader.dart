@@ -92,7 +92,7 @@ class HotReloader {
     final bool Function(BeforeReloadContext ctx)? onBeforeReload,
     final void Function(AfterReloadContext ctx)? onAfterReload,
   }) async {
-    if (!await new io.File('pubspec.yaml').exists()) {
+    if (!new io.File('pubspec.yaml').existsSync()) {
       throw StateError('''
 Error: [pubspec.yaml] file not found in current directory.
 For hot code reloading to function properly, Dart needs to be run from the root of your project.''');
@@ -151,12 +151,12 @@ For hot code reloading to function properly, Dart needs to be run from the root 
         if (pkgConfigURL.path.endsWith('.json')) {
           convert.json
               .decode(await new io.File(pkgConfigURL.toFilePath()).readAsString())['packages']
-              .map((dynamic v) => v['rootUri'])
+              .map((dynamic v) => v['rootUri'].toString())
 
-              // the ../ means relative to <project>/.dart_tool
-              // since we are at <project> level we change "../" to "./"
-              .map((rootUri) => rootUri.startsWith("../") ? rootUri.substring(1) : rootUri)
-              .map((rootUri) => Uri.parse(rootUri).toFilePath())
+              // '../' means relative to <project>/.dart_tool
+              // since we are already at <project> level we change '../' to './'
+              .map((dynamic rootUri) => rootUri.toString().startsWith('../') ? rootUri.substring(1) : rootUri)
+              .map((dynamic rootUri) => Uri.parse(rootUri.toString()).toFilePath())
               .forEach(watchList.add);
         } else {
           await pkgConfigURL
@@ -183,12 +183,12 @@ For hot code reloading to function properly, Dart needs to be run from the root 
         _LOG.fine('Skipped watching cached package at [$path]');
         continue;
       }
-      if (watchers.where((w) => path.startsWith(w.path)).length > 0) {
+      if (watchers.where((w) => path.startsWith(w.path)).isNotEmpty) {
         _LOG.fine('Skipped watching [$path] since parent path is already being watched');
         continue;
       }
 
-      final fileType = await io.FileSystemEntity.type(path);
+      final fileType = io.FileSystemEntity.typeSync(path);
       if (fileType == io.FileSystemEntityType.file) {
         watchers.add(isDockerized //
                 ? new PollingFileWatcher(path, pollingDelay: _debounceInterval) //
@@ -231,7 +231,11 @@ For hot code reloading to function properly, Dart needs to be run from the root 
 
     final reloadReports = <vms.IsolateRef, vms.ReloadReport>{};
     final failedReloadReports = <vms.IsolateRef, vms.ReloadReport>{};
-    for (final isolateRef in (await _vmService.getVM()).isolates ?? []) {
+    for (final isolateRef in (await _vmService.getVM()).isolates ?? <vms.IsolateRef>[]) {
+      if(isolateRef.id == null) {
+        _LOG.fine('Cannot hot-reload code of isolate [${isolateRef.name}] since its ID is null.');
+        continue;
+      }
       _LOG.fine('Hot-reloading code of isolate [${isolateRef.name}]...');
 
       var noVeto = true;
@@ -239,7 +243,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
         if (changes?.isEmpty ?? true) {
           noVeto = _onBeforeReload?.call(new BeforeReloadContext(null, isolateRef)) ?? true;
         } else {
-          for (final change in changes ?? []) {
+          for (final change in changes ?? <WatchEvent>[]) {
             if (!(_onBeforeReload?.call(new BeforeReloadContext(change, isolateRef)) ?? true)) {
               noVeto = false;
             }
@@ -249,7 +253,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
 
       if (noVeto) {
         try {
-          final reloadReport = await _vmService.reloadSources(isolateRef.id,
+          final reloadReport = await _vmService.reloadSources(isolateRef.id!,
               force: force, //
               packagesUri: isPackagesFileChanged ? packagesFile.uri.toString() : null //
               );

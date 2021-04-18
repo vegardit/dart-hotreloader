@@ -11,4 +11,6 @@ if [ "$1" == "--help" ]; then
    exit 0
 fi
 
+set -eux
+
 dart --enable-asserts --enable-vm-service $(dirname $0)/../test/hotreloader_test.dart
