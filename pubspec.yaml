@@ -1,6 +1,6 @@
 # https://dart.dev/tools/pub/pubspec
 name: hotreloader
-version: 3.0.1
+version: 3.0.2-SNAPSHOT
 
 description: >
   Automatic hot code reloader for Dart projects that monitors the source files of a Dart
