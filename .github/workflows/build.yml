@@ -3,7 +3,12 @@ name: Build
 
 on:
   push:
+    branches:
+    - '**'
+    tags-ignore:
+    - '**'
     paths-ignore:
+    - '**/*.adoc'
     - '**/*.md'
     - '.github/*.yml'
   workflow_dispatch:
@@ -17,7 +22,8 @@ jobs:
       fail-fast: false
       matrix:
         DART_VERSION: 
-          - latest
+          - stable
+          - 2.13.0
           - 2.12.4
         OS:
           - ubuntu-latest
@@ -28,9 +34,9 @@ jobs:
     - name: Git Checkout
       uses: actions/checkout@v2 #https://github.com/actions/checkout
 
-    - uses: cedx/setup-dart@v2
+    - uses: dart-lang/setup-dart@v1
       with:
-        version: ${{ matrix.DART_VERSION }}
+        sdk: ${{ matrix.DART_VERSION }}
 
     - name: Cache Dart Pub
       uses: actions/cache@v2
