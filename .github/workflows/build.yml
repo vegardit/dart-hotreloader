@@ -1,3 +1,8 @@
+# Copyright 2020-2021 by Vegard IT GmbH, Germany, https://vegardit.com
+# SPDX-License-Identifier: Apache-2.0
+#
+# Author: Sebastian Thomschke, Vegard IT GmbH
+#
 # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions
 name: Build
 
@@ -11,6 +16,7 @@ on:
     - '**/*.adoc'
     - '**/*.md'
     - '.github/*.yml'
+  pull_request:
   workflow_dispatch:
     # https://github.blog/changelog/2020-07-06-github-actions-manual-triggers-with-workflow_dispatch/
 
@@ -23,7 +29,7 @@ jobs:
       matrix:
         DART_VERSION: 
           - stable
-          - 2.13.0
+          - 2.13.4
           - 2.12.4
         OS:
           - ubuntu-latest
@@ -50,7 +56,7 @@ jobs:
       shell: bash
       run: |
         # set MAY_CREATE_RELEASE variable used by build.sh
-        if [ "${{ matrix.DART_VERSION }}" == "latest" ] && [ "${{ matrix.OS }}" == "ubuntu-latest" ] && [[ $GITHUB_REF == */master ]]; then
+        if [ "${{ matrix.DART_VERSION }}" == "latest" ] && [ "${{ matrix.OS }}" == "ubuntu-latest" ] && [[ $GITHUB_REF == */main ]]; then
            export MAY_CREATE_RELEASE=true
            # configure read-write GIT credentials
            git config credential.helper "store --file=.git/credentials"
