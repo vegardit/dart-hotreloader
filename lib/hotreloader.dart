@@ -232,7 +232,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     final reloadReports = <vms.IsolateRef, vms.ReloadReport>{};
     final failedReloadReports = <vms.IsolateRef, vms.ReloadReport>{};
     for (final isolateRef in (await _vmService.getVM()).isolates ?? <vms.IsolateRef>[]) {
-      if(isolateRef.id == null) {
+      if (isolateRef.id == null) {
         _LOG.fine('Cannot hot-reload code of isolate [${isolateRef.name}] since its ID is null.');
         continue;
       }
