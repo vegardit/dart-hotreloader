@@ -16,6 +16,9 @@ linter:
     # http://dart-lang.github.io/linter/lints/avoid_as.html
     avoid_as: true
 
+    # https://dart-lang.github.io/linter/lints/avoid_dynamic_calls.html
+    avoid_dynamic_calls: false
+
     # https://github.com/passsy/dart-lint/blob/master/lib/analysis_options.yaml
     avoid_equals_and_hash_code_on_mutable_classes: true
 
@@ -45,6 +48,9 @@ linter:
     prefer_mixin: true
 
     prefer_single_quotes: true
+
+    # https://dart-lang.github.io/linter/lints/require_trailing_commas.html
+    require_trailing_commas: false
 
     # allow java-style comments
     # https://dart-lang.github.io/linter/lints/slash_for_doc_comments.html
