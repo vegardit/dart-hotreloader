@@ -16,11 +16,11 @@ import 'package:stream_transform/stream_transform.dart' show RateLimit; // debou
 import 'package:vm_service/vm_service.dart' as vms;
 import 'package:watcher/watcher.dart';
 
-import 'src/util/docker.dart' as docker;
-import 'src/util/files.dart' show UriExtensions;
-import 'src/util/pub.dart' as pub;
-import 'src/util/strings.dart' as strings;
-import 'src/util/vm.dart' as vm_utils;
+import 'package:hotreloader/src/util/docker.dart' as docker;
+import 'package:hotreloader/src/util/files.dart' show UriExtensions;
+import 'package:hotreloader/src/util/pub.dart' as pub;
+import 'package:hotreloader/src/util/strings.dart' as strings;
+import 'package:hotreloader/src/util/vm.dart' as vm_utils;
 
 final _LOG = new logging.Logger('hotreloader');
 
