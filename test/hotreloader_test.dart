@@ -63,7 +63,7 @@ Future<void> test_programmatic_reload() async {
   final hotreloader = await HotReloader.create(
     automaticReload: false,
     // ignore: avoid_redundant_argument_values
-    debounceInterval: const Duration(seconds: 0), //
+    debounceInterval: Duration.zero, //
     onBeforeReload: (ctx) {
       callbacksTriggered++;
       return true;
@@ -97,7 +97,7 @@ Future<void> test_automatic_reload() async {
   final reloaded = new Completer<void>();
   final hotreloader = await HotReloader.create(
     // ignore: avoid_redundant_argument_values
-    debounceInterval: const Duration(seconds: 0), //
+    debounceInterval: Duration.zero, //
     onAfterReload: (ctx) {
       if (!reloaded.isCompleted) reloaded.complete();
     },
