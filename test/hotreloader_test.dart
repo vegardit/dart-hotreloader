@@ -8,8 +8,8 @@ import 'dart:async';
 import 'dart:io' as io;
 import 'dart:isolate';
 
-import 'package:logging/logging.dart' as logging;
 import 'package:hotreloader/hotreloader.dart';
+import 'package:logging/logging.dart' as logging;
 
 import 'reloadable.dart' as reloadable;
 

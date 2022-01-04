@@ -10,17 +10,16 @@ import 'dart:io' as io;
 import 'dart:isolate' as isolates;
 
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:logging/logging.dart' as logging;
-import 'package:path/path.dart' as p;
-import 'package:stream_transform/stream_transform.dart' show RateLimit; // debounceBuffer
-import 'package:vm_service/vm_service.dart' as vms;
-import 'package:watcher/watcher.dart';
-
 import 'package:hotreloader/src/util/docker.dart' as docker;
 import 'package:hotreloader/src/util/files.dart' show UriExtensions;
 import 'package:hotreloader/src/util/pub.dart' as pub;
 import 'package:hotreloader/src/util/strings.dart' as strings;
 import 'package:hotreloader/src/util/vm.dart' as vm_utils;
+import 'package:logging/logging.dart' as logging;
+import 'package:path/path.dart' as p;
+import 'package:stream_transform/stream_transform.dart' show RateLimit; // debounceBuffer
+import 'package:vm_service/vm_service.dart' as vms;
+import 'package:watcher/watcher.dart';
 
 final _LOG = new logging.Logger('hotreloader');
 
