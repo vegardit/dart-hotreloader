@@ -58,7 +58,7 @@ jobs:
       shell: bash
       run: |
         # set MAY_CREATE_RELEASE variable used by build.sh
-        if [ "${{ matrix.DART_VERSION }}" == "latest" ] && [ "${{ matrix.OS }}" == "ubuntu-latest" ] && [[ $GITHUB_REF == */main ]]; then
+        if [ "${{ matrix.DART_VERSION }}" == "stable" ] && [ "${{ matrix.OS }}" == "ubuntu-latest" ] && [[ $GITHUB_REF == */main ]]; then
            export MAY_CREATE_RELEASE=true
            # configure read-write GIT credentials
            git config credential.helper "store --file=.git/credentials"
