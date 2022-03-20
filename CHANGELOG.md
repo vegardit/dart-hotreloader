@@ -12,8 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - [#6](https://github.com/vegardit/dart-hotreloader/issues/6) Awaiting HotReloader.stop() causes program to wait forever
 
+### Changed
+- support vm_service 8.x
 
-## [3.0.2] - 2022-01-4
+
+## [3.0.2] - 2022-01-04
 
 ### Changed
 - support vm_service 7.x

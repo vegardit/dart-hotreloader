@@ -21,7 +21,7 @@ dependencies:
   logging:          ^1.0.0  # https://pub.dev/packages/logging
   path:             ^1.8.0  # https://pub.dev/packages/path
   stream_transform: ^2.0.0  # https://pub.dev/packages/stream_transform
-  vm_service:       ">=6.0.1 <8.0.0"  # https://pub.dev/packages/vm_service
+  vm_service:       ">=6.0.1 <9.0.0"  # https://pub.dev/packages/vm_service
   watcher:          ^1.0.0  # https://pub.dev/packages/watcher
 
 dev_dependencies:
