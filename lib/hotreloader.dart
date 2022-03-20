@@ -100,7 +100,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     final instance = new HotReloader._(
       watchDependencies,
       debounceInterval,
-      await vm_utils.vmService,
+      await vm_utils.createVmService(),
       onBeforeReload,
       onAfterReload,
     );
@@ -334,5 +334,10 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     } else {
       _LOG.fine('Was not watching any paths.');
     }
+
+    // to prevent "Unhandled exception: reloadSources: (-32000) Service connection disposed"
+    await Future<void>.delayed(const Duration(seconds: 2));
+
+    await _vmService.dispose();
   }
 }

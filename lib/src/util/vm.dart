@@ -13,7 +13,7 @@ import 'package:vm_service/vm_service_io.dart' as vms_io;
 /**
  * @throws StateError if VM service is not available
  */
-Future<vms.VmService> _getVmService() async {
+Future<vms.VmService> createVmService() async {
   final devServiceURL = (await dev.Service.getInfo()).serverUri;
   if (devServiceURL == null) {
     throw new StateError('VM service not available! You need to run dart with --enable-vm-service.');
@@ -21,5 +21,3 @@ Future<vms.VmService> _getVmService() async {
   final wsURL = vms_utils.convertToWebSocketUrl(serviceProtocolUrl: devServiceURL);
   return vms_io.vmServiceConnectUri(wsURL.toString());
 }
-
-late final Future<vms.VmService> vmService = _getVmService();
