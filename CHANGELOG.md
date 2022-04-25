@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [3.0.4] - 2022-04-25
+
+### Fixed
+- [#9](https://github.com/vegardit/dart-hotreloader/issues/9) multiple directories starting with same characters are not watched
+
+
 ## [3.0.3] - 2022-03-20
 
 ### Fixed
