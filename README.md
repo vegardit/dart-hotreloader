@@ -29,11 +29,17 @@ hotreloader 3.x requires [Dart SDK](https://dart.dev/get-dart) **2.12.0** or hig
 
 ## <a name="how-to-use"></a>How to use
 
-1. Add this to your `pubspec.yaml`
+1. Add hotreloader to your dev dependencies using this command
+
+   ```sh
+   dart pub add --dev hotreloader
+   ```
+
+   or by adding this to your `pubspec.yaml`:
 
    ```yaml
    dev_dependencies:
-     hotreloader: ^3.0.2
+     hotreloader: ^3.0.4
    ```
 
 1. Enable hot reloading in your entry point dart file, e.g. `bin/main.dart`
@@ -125,7 +131,7 @@ Future<void> main() async {
 
 - https://pub.dev/packages/angel_hot (last update 05/2019)
 - https://pub.dev/packages/jaguar_hotreload (last update 02/2019)
-- https://pub.dev/packages/recharge (last update 02/2020)
+- https://pub.dev/packages/recharge
 - https://pub.dev/packages/reloader (last update 01/2019)
 
 
