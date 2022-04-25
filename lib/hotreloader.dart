@@ -178,11 +178,11 @@ For hot code reloading to function properly, Dart needs to be run from the root 
 
     final watchers = <Watcher>[];
     for (final path in watchList) {
-      if (path.startsWith(pubCacheDir.path)) {
+      if (path == pubCacheDir.path || p.isWithin(pubCacheDir.path, path)) {
         _LOG.fine('Skipped watching cached package at [$path]');
         continue;
       }
-      if (watchers.where((w) => path.startsWith(w.path)).isNotEmpty) {
+      if (watchers.where((w) => path == w.path || p.isWithin(w.path, path)).isNotEmpty) {
         _LOG.fine('Skipped watching [$path] since parent path is already being watched');
         continue;
       }
