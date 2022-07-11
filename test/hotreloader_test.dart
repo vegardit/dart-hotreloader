@@ -13,14 +13,14 @@ import 'package:logging/logging.dart' as logging;
 
 import 'reloadable.dart' as reloadable;
 
-final _LOG = new logging.Logger('hotreloader.test');
+final log = new logging.Logger('hotreloader.test');
 
 Future<void> _writeReloadableDartFile([String content = "String testfunc() => 'foo';"]) async {
   // waiting for two seconds so that the modification timestamp will be different on
   // filesystems with seconds-only precision
   await Future<void>.delayed(const Duration(seconds: 2));
   final dartFile = new io.File('test/reloadable.dart');
-  _LOG.info('Writing to [${dartFile.path}]: $content');
+  log.info('Writing to [${dartFile.path}]: $content');
   await dartFile.writeAsString(content, flush: true);
 }
 
@@ -52,12 +52,12 @@ Future<void> main() async {
   await test_programmatic_reload();
   await test_automatic_reload();
 
-  _LOG.info('*** ALL TESTS COMPLETED.***');
+  log.info('*** ALL TESTS COMPLETED.***');
   io.exit(0);
 }
 
 Future<void> test_programmatic_reload() async {
-  _LOG.info('TEST: test_programmatic_reload...');
+  log.info('TEST: test_programmatic_reload...');
 
   var callbacksTriggered = 0;
   final hotreloader = await HotReloader.create(
@@ -92,7 +92,7 @@ Future<void> test_programmatic_reload() async {
 }
 
 Future<void> test_automatic_reload() async {
-  _LOG.info('TEST: test_automatic_reload...');
+  log.info('TEST: test_automatic_reload...');
 
   final reloaded = new Completer<void>();
   final hotreloader = await HotReloader.create(

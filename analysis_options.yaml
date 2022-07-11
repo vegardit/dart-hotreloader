@@ -37,10 +37,6 @@ linter:
     # https://dart-lang.github.io/linter/lints/literal_only_boolean_expressions.html
     literal_only_boolean_expressions: true
 
-    # allow uppercase for final module vars
-    # https://dart-lang.github.io/linter/lints/non_constant_identifier_names.html
-    non_constant_identifier_names: false
-
     # https://dart-lang.github.io/linter/lints/omit_local_variable_types.html
     omit_local_variable_types: true
 

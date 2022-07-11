@@ -21,7 +21,7 @@ import 'package:stream_transform/stream_transform.dart' show RateLimit; // debou
 import 'package:vm_service/vm_service.dart' as vms;
 import 'package:watcher/watcher.dart';
 
-final _LOG = new logging.Logger('hotreloader');
+final log = new logging.Logger('hotreloader');
 
 enum HotReloadResult {
   /**
@@ -70,11 +70,11 @@ class AfterReloadContext {
  */
 class HotReloader {
   static logging.Level get logLevel {
-    return _LOG.level;
+    return log.level;
   }
 
   static set logLevel(final logging.Level level) {
-    _LOG.level = level;
+    log.level = level;
   }
 
   /**
@@ -146,7 +146,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
       // add source folders of all dependencies to watch list
       final pkgConfigURL = await isolates.Isolate.packageConfig;
       if (pkgConfigURL != null) {
-        _LOG.config('pkgConfigURL: $pkgConfigURL');
+        log.config('pkgConfigURL: $pkgConfigURL');
         if (pkgConfigURL.path.endsWith('.json')) {
           convert.json
               .decode(await new io.File(pkgConfigURL.toFilePath()).readAsString())['packages']
@@ -171,19 +171,19 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     watchList.sort();
 
     final pubCacheDir = pub.pubCacheDir;
-    _LOG.fine('pubCacheDir: [${pubCacheDir.path}]');
+    log.fine('pubCacheDir: [${pubCacheDir.path}]');
 
     final isDockerized = await docker.isRunningInDockerContainer;
-    _LOG.fine('isDockerized: [$isDockerized]');
+    log.fine('isDockerized: [$isDockerized]');
 
     final watchers = <Watcher>[];
     for (final path in watchList) {
       if (path == pubCacheDir.path || p.isWithin(pubCacheDir.path, path)) {
-        _LOG.fine('Skipped watching cached package at [$path]');
+        log.fine('Skipped watching cached package at [$path]');
         continue;
       }
       if (watchers.where((w) => path == w.path || p.isWithin(w.path, path)).isNotEmpty) {
-        _LOG.fine('Skipped watching [$path] since parent path is already being watched');
+        log.fine('Skipped watching [$path] since parent path is already being watched');
         continue;
       }
 
@@ -203,7 +203,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     }
 
     for (final watcher in watchers) {
-      _LOG.config('Watching [${watcher.path}] with [${watcher.runtimeType}]...');
+      log.config('Watching [${watcher.path}] with [${watcher.runtimeType}]...');
       final watchedStream = watcher.events //
           .debounceBuffer(_debounceInterval) //
           .listen(_onFilesModified);
@@ -219,7 +219,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     final List<WatchEvent>? changes,
     final bool force,
   ) async {
-    _LOG.info('Hot-reloading code...');
+    log.info('Hot-reloading code...');
 
     final packagesFile = await pub.packagesFile;
     final isPackagesFileChanged = null !=
@@ -232,10 +232,10 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     final failedReloadReports = <vms.IsolateRef, vms.ReloadReport>{};
     for (final isolateRef in (await _vmService.getVM()).isolates ?? <vms.IsolateRef>[]) {
       if (isolateRef.id == null) {
-        _LOG.fine('Cannot hot-reload code of isolate [${isolateRef.name}] since its ID is null.');
+        log.fine('Cannot hot-reload code of isolate [${isolateRef.name}] since its ID is null.');
         continue;
       }
-      _LOG.fine('Hot-reloading code of isolate [${isolateRef.name}]...');
+      log.fine('Hot-reloading code of isolate [${isolateRef.name}]...');
 
       var noVeto = true;
       if (_onBeforeReload != null) {
@@ -260,13 +260,13 @@ For hot code reloading to function properly, Dart needs to be run from the root 
             failedReloadReports[isolateRef] = reloadReport;
           }
           reloadReports[isolateRef] = reloadReport;
-          _LOG.finest('reloadReport for [${isolateRef.name}]: $reloadReport');
+          log.finest('reloadReport for [${isolateRef.name}]: $reloadReport');
         } on vms.SentinelException catch (ex) {
           // happens when the isolate has been garbage collected in the meantime
-          _LOG.warning('Failed to reload code of isolate [${isolateRef.name}]: $ex');
+          log.warning('Failed to reload code of isolate [${isolateRef.name}]: $ex');
         }
       } else {
-        _LOG.fine('Skipped hot-reloading code of isolate [${isolateRef.name}] because of listener veto.');
+        log.fine('Skipped hot-reloading code of isolate [${isolateRef.name}] because of listener veto.');
       }
     }
 
@@ -275,25 +275,25 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     }
 
     if (reloadReports.isEmpty) {
-      _LOG.info('Hot-reloading code skipped because of listener veto.');
+      log.info('Hot-reloading code skipped because of listener veto.');
       return HotReloadResult.Skipped;
     }
 
     if (failedReloadReports.isEmpty) {
-      _LOG.info('Hot-reloading code succeeded.');
+      log.info('Hot-reloading code succeeded.');
       _onAfterReload?.call(new AfterReloadContext(changes, reloadReports, HotReloadResult.Succeeded));
       return HotReloadResult.Succeeded;
     }
 
     if (failedReloadReports.length == reloadReports.length) {
       //{type:ReloadReport,success:false,notices:[{type:ReasonForCancelling,message:"lib/src/config.dart:32:1: Error: Expected ';' after this."}]}
-      _LOG.severe('Hot-reloading code failed:\n ${failedReloadReports.values.first.json?['notices'][0]['message']}');
+      log.severe('Hot-reloading code failed:\n ${failedReloadReports.values.first.json?['notices'][0]['message']}');
       _onAfterReload?.call(new AfterReloadContext(changes, reloadReports, HotReloadResult.Failed));
       return HotReloadResult.Failed;
     }
 
     final failedIsolates = failedReloadReports.keys.map((i) => '${i.name}@${i.number}').join(',');
-    _LOG.severe(
+    log.severe(
         'Hot-reloading code failed for some isolates [$failedIsolates]:\n ${failedReloadReports.values.first.json?['notices'][0]['message']}');
     _onAfterReload?.call(new AfterReloadContext(changes, reloadReports, HotReloadResult.PartiallySucceeded));
     return HotReloadResult.PartiallySucceeded;
@@ -306,9 +306,9 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     if (changes.isEmpty) return;
 
     for (final event in changes) {
-      _LOG.info('Change detected: type=[${event.type}] path=[${event.path}]');
+      log.info('Change detected: type=[${event.type}] path=[${event.path}]');
     }
-    _LOG.finest(changes);
+    log.finest(changes);
     await _reloadCode(changes, false);
   }
 
@@ -328,11 +328,11 @@ For hot code reloading to function properly, Dart needs to be run from the root 
    */
   Future<void> stop() async {
     if (_watchedStreams.isNotEmpty) {
-      _LOG.info('Stopping to watch paths...');
+      log.info('Stopping to watch paths...');
       await Future.wait<dynamic>(_watchedStreams.map((s) => s.cancel()));
       _watchedStreams.clear();
     } else {
-      _LOG.fine('Was not watching any paths.');
+      log.fine('Was not watching any paths.');
     }
 
     // to prevent "Unhandled exception: reloadSources: (-32000) Service connection disposed"
