@@ -13,7 +13,7 @@ Future<io.File> _getPackagesFile() async {
   return new io.File(path).absolute;
 }
 
-late final Future<io.File> packagesFile = _getPackagesFile();
+final Future<io.File> packagesFile = _getPackagesFile();
 
 io.Directory _getPubCacheDir() {
   final env = io.Platform.environment;
@@ -25,4 +25,4 @@ io.Directory _getPubCacheDir() {
   return new io.Directory(p.normalize(path)).absolute;
 }
 
-late final io.Directory pubCacheDir = _getPubCacheDir();
+final io.Directory pubCacheDir = _getPubCacheDir();

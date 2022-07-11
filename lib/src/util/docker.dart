@@ -7,7 +7,7 @@
 import 'dart:convert' as convert;
 import 'dart:io';
 
-late final Future<bool> isRunningInDockerContainer = _isRunningInDockerContainer();
+final Future<bool> isRunningInDockerContainer = _isRunningInDockerContainer();
 
 /**
  * @return true if the program is running within a docker container
