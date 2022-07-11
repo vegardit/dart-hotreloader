@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- support vm_service 9.x
+
 
 ## [3.0.4] - 2022-04-25
 
