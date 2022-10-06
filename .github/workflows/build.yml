@@ -27,12 +27,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        DART_VERSION: 
+        DART_VERSION:
+          # https://dart.dev/get-dart/archive
           - stable
-          - 2.16.2
-          - 2.15.1
-          - 2.14.4
-          - 2.13.4
+          - 2.18.2
           - 2.12.4
         OS:
           - ubuntu-latest
