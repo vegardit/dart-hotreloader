@@ -49,14 +49,14 @@ Future<void> main() async {
 
   HotReloader.logLevel = logging.Level.FINEST;
 
-  await test_programmatic_reload();
-  await test_automatic_reload();
+  await testProgrammaticReload();
+  await testAutomaticReload();
 
   log.info('*** ALL TESTS COMPLETED.***');
   io.exit(0);
 }
 
-Future<void> test_programmatic_reload() async {
+Future<void> testProgrammaticReload() async {
   log.info('TEST: test_programmatic_reload...');
 
   var callbacksTriggered = 0;
@@ -70,7 +70,7 @@ Future<void> test_programmatic_reload() async {
     },
     onAfterReload: (ctx) {
       callbacksTriggered++;
-    },
+    }
   );
 
   try {
@@ -91,16 +91,15 @@ Future<void> test_programmatic_reload() async {
   }
 }
 
-Future<void> test_automatic_reload() async {
+Future<void> testAutomaticReload() async {
   log.info('TEST: test_automatic_reload...');
 
   final reloaded = new Completer<void>();
   final hotreloader = await HotReloader.create(
-    // ignore: avoid_redundant_argument_values
     debounceInterval: Duration.zero, //
     onAfterReload: (ctx) {
       if (!reloaded.isCompleted) reloaded.complete();
-    },
+    }
   );
 
   try {
