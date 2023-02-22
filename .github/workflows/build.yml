@@ -15,10 +15,17 @@ on:
     paths-ignore:
     - '**/*.adoc'
     - '**/*.md'
+    - '.editorconfig'
+    - '.git*'
     - '.github/*.yml'
+    - 'tool'
   pull_request:
   workflow_dispatch:
     # https://github.blog/changelog/2020-07-06-github-actions-manual-triggers-with-workflow_dispatch/
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   build:
@@ -30,7 +37,7 @@ jobs:
         DART_VERSION:
           # https://dart.dev/get-dart/archive
           - stable
-          - 2.18.2
+          - 2.19.2
           - 2.12.4
         OS:
           - ubuntu-latest
@@ -54,7 +61,6 @@ jobs:
           ${{ runner.os }}-dartpub-
 
     - name: Build
-      shell: bash
       run: |
         # set MAY_CREATE_RELEASE variable used by build.sh
         if [ "${{ matrix.DART_VERSION }}" == "stable" ] && [ "${{ matrix.OS }}" == "ubuntu-latest" ] && [[ $GITHUB_REF == */main ]]; then

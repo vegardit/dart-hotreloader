@@ -20,16 +20,7 @@ echo
 echo "###################################################"
 echo "# Determining GIT branch......                    #"
 echo "###################################################"
-if [[ $CI == "true" && ${TRAVIS:-false} == "true" && $USER == "travis" ]]; then
-   # https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
-   if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then
-      GIT_BRANCH="$TRAVIS_BRANCH"
-   else
-      GIT_BRANCH="$TRAVIS_PULL_REQUEST_BRANCH"
-   fi
-else
-   GIT_BRANCH=$(git branch --show-current)
-fi
+GIT_BRANCH=$(git branch --show-current)
 echo "  -> GIT Branch: $GIT_BRANCH"; echo
 
 echo "###########################################################"
