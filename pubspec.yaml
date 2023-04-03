@@ -1,6 +1,6 @@
 # https://dart.dev/tools/pub/pubspec
 name: hotreloader
-version: 3.0.6-SNAPSHOT
+version: 3.0.6
 
 description: >
   Automatic hot code reloader for Dart projects that monitors the source files of a Dart
@@ -25,4 +25,4 @@ dependencies:
   watcher:          ^1.0.0  # https://pub.dev/packages/watcher
 
 dev_dependencies:
-  lint: ^1.5.3
+  lint: ^1.5.3 # >=1.6.0 requires SDK version >=2.13.0
