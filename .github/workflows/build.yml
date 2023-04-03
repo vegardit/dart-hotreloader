@@ -8,9 +8,9 @@ name: Build
 
 on:
   push:
-    branches:
+    branches:    # build all branches
     - '**'
-    tags-ignore:
+    tags-ignore: # but don't build tags
     - '**'
     paths-ignore:
     - '**/*.adoc'
@@ -37,7 +37,7 @@ jobs:
         DART_VERSION:
           # https://dart.dev/get-dart/archive
           - stable
-          - 2.19.2
+          - 2.19.6
           - 2.12.4
         OS:
           - ubuntu-latest
