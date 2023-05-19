@@ -13,9 +13,6 @@ analyzer:
 #  https://dart-lang.github.io/linter/lints/
 linter:
   rules:
-    # http://dart-lang.github.io/linter/lints/avoid_as.html
-    avoid_as: true
-
     # https://dart-lang.github.io/linter/lints/avoid_dynamic_calls.html
     avoid_dynamic_calls: false
 
