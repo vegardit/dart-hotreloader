@@ -46,7 +46,7 @@ jobs:
 
     steps:
     - name: Git Checkout
-      uses: actions/checkout@v3 #https://github.com/actions/checkout
+      uses: actions/checkout@v4 #https://github.com/actions/checkout
 
     - uses: dart-lang/setup-dart@v1
       with:
