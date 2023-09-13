@@ -12,7 +12,7 @@ Demo project for the [hotreloader](https://github.com/vegardit/dart-hotreloader)
 
 ## <a name="requirements"></a>Requirements
 
-[Dart SDK](https://dart.dev/get-dart) **2.12.0** or higher.
+[Dart SDK](https://dart.dev/get-dart) **3.0.0** or higher.
 
 
 ## <a name="how-to-use"></a>How to use

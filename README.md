@@ -26,6 +26,8 @@ hotreloader 1.x-2.x requires [Dart SDK](https://dart.dev/get-dart) **2.6.0** or 
 
 hotreloader 3.x requires [Dart SDK](https://dart.dev/get-dart) **2.12.0** or higher.
 
+hotreloader 4.x requires [Dart SDK](https://dart.dev/get-dart) **3.0.0** or higher.
+
 
 ## <a name="how-to-use"></a>How to use
 
