@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-#
-# Copyright 2020-2022 by Vegard IT GmbH, Germany, https://vegardit.com
+# SPDX-FileCopyrightText: © Vegard IT GmbH (https://vegardit.com) and contributors
+# SPDX-FileContributor: Sebastian Thomschke, Vegard IT GmbH
 # SPDX-License-Identifier: Apache-2.0
-#
-# @author Sebastian Thomschke, Vegard IT GmbH
 
 set -e # abort script at first error
 set -o pipefail # causes a pipeline to return the exit status of the last command in the pipe that returned a non-zero return value

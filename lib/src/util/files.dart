@@ -1,9 +1,9 @@
-/**
- * Copyright 2020-2022 by Vegard IT GmbH (https://vegardit.com) and contributors.
+/*
+ * SPDX-FileCopyrightText: © Vegard IT GmbH (https://vegardit.com) and contributors
+ * SPDX-FileContributor: Sebastian Thomschke, Vegard IT GmbH
  * SPDX-License-Identifier: Apache-2.0
- *
- * @author Sebastian Thomschke, Vegard IT GmbH
  */
+library;
 
 import 'dart:convert' as convert;
 import 'dart:io' as io;
