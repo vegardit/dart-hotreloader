@@ -29,7 +29,7 @@ defaults:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.OS }}
 
     strategy:
       fail-fast: false
@@ -37,8 +37,7 @@ jobs:
         DART_VERSION:
           # https://dart.dev/get-dart/archive
           - stable
-          - 2.19.6
-          - 2.12.4
+          - 3.1.1
         OS:
           - ubuntu-latest
           - macos-latest
