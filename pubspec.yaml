@@ -1,6 +1,6 @@
 # https://dart.dev/tools/pub/pubspec
 name: hotreloader
-version: 3.0.7-SNAPSHOT
+version: 4.0.0-SNAPSHOT
 
 description: >
   Automatic hot code reloader for Dart projects that monitors the source files of a Dart
@@ -13,7 +13,7 @@ issue_tracker: https://github.com/vegardit/dart-hotreloader/issues
 
 environment:
   # https://dart.dev/tools/pub/pubspec#sdk-constraints
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 # https://dart.dev/tools/pub/dependencies#version-constraints
 dependencies:
@@ -22,7 +22,7 @@ dependencies:
   path:             ^1.8.0  # https://pub.dev/packages/path
   stream_transform: ^2.0.0  # https://pub.dev/packages/stream_transform
   vm_service:       ">=6.0.1 <12.0.0"  # https://pub.dev/packages/vm_service
-  watcher:          ^1.0.0  # https://pub.dev/packages/watcher
+  watcher:          ^1.1.0  # https://pub.dev/packages/watcher
 
 dev_dependencies:
-  lint: ^1.5.3 # >=1.6.0 requires SDK version >=2.13.0
+  lint: ^2.1.2
