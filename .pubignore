@@ -1,3 +1,9 @@
+# Dart Publish
+.ci
+.github
+test
+tool
+
 # Local work folder that is not checked in
 _LOCAL/
 
