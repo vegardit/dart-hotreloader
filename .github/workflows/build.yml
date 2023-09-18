@@ -37,14 +37,34 @@ jobs:
           # https://dart.dev/get-dart/archive
           - stable
           - 3.1.1
+          - 3.0.0
         OS:
           - ubuntu-latest
           - macos-latest
           - windows-latest
 
     steps:
+    - name: Init
+      id: init
+      run: |
+        if [[ "${{ matrix.DART_VERSION }}" == "stable" && "${{ matrix.OS }}" == "ubuntu-latest" && $GITHUB_REF_NAME == "main" ]]; then
+          echo "MAY_CREATE_RELEASE=true" >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Git Checkout
+      if: ${{ steps.init.outputs.MAY_CREATE_RELEASE != 'true' }}
       uses: actions/checkout@v4 #https://github.com/actions/checkout
+
+    # Publishing Dart packages automatically requires to run a workflow on a newly created tag https://dart.dev/tools/pub/automated-publishing
+    # However creating a tag in a workflow using the GITHUB_TOKEN, a token of a GitHub App or a personal access token does
+    # not trigger the second workflow. It only works when creating the tag with a deploy key. See also:
+    # https://github.com/orgs/community/discussions/27028
+    # https://github.com/orgs/community/discussions/27194
+    - name: Git Checkout
+      if: ${{ steps.init.outputs.MAY_CREATE_RELEASE == 'true' }}
+      uses: actions/checkout@v4 #https://github.com/actions/checkout
+      with:
+        ssh-key: ${{ secrets.DART_PUB_DEPLOY_KEY }}
 
     - uses: dart-lang/setup-dart@v1
       with:
@@ -61,22 +81,13 @@ jobs:
     - name: Build
       run: |
         # set MAY_CREATE_RELEASE variable used by build.sh
-        if [ "${{ matrix.DART_VERSION }}" == "stable" ] && [ "${{ matrix.OS }}" == "ubuntu-latest" ] && [[ $GITHUB_REF == */main ]]; then
+        if [[ "${{ steps.init.outputs.MAY_CREATE_RELEASE }}" == "true" ]]; then
            export MAY_CREATE_RELEASE=true
-           # configure read-write GIT credentials
-           git config credential.helper "store --file=.git/credentials"
-           echo "https://${{ secrets.GITHUB_TOKEN }}:@github.com" > .git/credentials 2>/dev/null
 
-           export PUBDEV_ACCESS_TOKEN="${{ secrets.PUBDEV_ACCESS_TOKEN }}"
-           export PUBDEV_REFRESH_TOKEN="${{ secrets.PUBDEV_REFRESH_TOKEN }}"
-           export PUBDEV_ID_TOKEN="${{ secrets.PUBDEV_ID_TOKEN }}"
-           export PUBDEV_TOKEN_EXPIRATION="${{ secrets.PUBDEV_TOKEN_EXPIRATION }}"
+           git config --global user.name "github-actions[bot]"
+           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         else
            export MAY_CREATE_RELEASE=false
         fi
-
-        # https://github.community/t/github-actions-bot-email-address/17204
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
         bash .ci/build.sh

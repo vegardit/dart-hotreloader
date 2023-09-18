@@ -8,8 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2023-09-18
+
 ### Changed
-- require Dart 3.0.0 or higher
+- require/support Dart 3.0.0 or higher
 
 
 ## [3.0.6] - 2023-04-03
