@@ -22,11 +22,11 @@ and automatically applies them using the Dart VM's [hot reload](https://github.c
 
 ## <a name="requirements"></a>Requirements
 
-hotreloader 1.x-2.x requires [Dart SDK](https://dart.dev/get-dart) **2.6.0** or higher.
+hotreloader 4.x requires [Dart SDK](https://dart.dev/get-dart) **3.0.0** or higher.
 
 hotreloader 3.x requires [Dart SDK](https://dart.dev/get-dart) **2.12.0** or higher.
 
-hotreloader 4.x requires [Dart SDK](https://dart.dev/get-dart) **3.0.0** or higher.
+hotreloader 1.x-2.x requires [Dart SDK](https://dart.dev/get-dart) **2.6.0** or higher.
 
 
 ## <a name="how-to-use"></a>How to use
@@ -41,7 +41,7 @@ hotreloader 4.x requires [Dart SDK](https://dart.dev/get-dart) **3.0.0** or high
 
    ```yaml
    dev_dependencies:
-     hotreloader: ^3.0.4
+     hotreloader: ^4.0.0
    ```
 
 1. Enable hot reloading in your entry point dart file, e.g. `bin/main.dart`
@@ -133,7 +133,7 @@ Future<void> main() async {
 
 - https://pub.dev/packages/angel_hot (last update 05/2019)
 - https://pub.dev/packages/jaguar_hotreload (last update 02/2019)
-- https://pub.dev/packages/recharge
+- https://pub.dev/packages/recharge (last update 04/2022)
 - https://pub.dev/packages/reloader (last update 01/2019)
 
 
