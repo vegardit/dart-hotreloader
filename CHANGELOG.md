@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [4.1.0] - 2023-10-26
+
+### Changed
+- support vm_service 12.x and 13.x
+
+
 ## [4.0.0] - 2023-09-18
 
 ### Changed
