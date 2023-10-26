@@ -41,7 +41,7 @@ hotreloader 1.x-2.x requires [Dart SDK](https://dart.dev/get-dart) **2.6.0** or 
 
    ```yaml
    dev_dependencies:
-     hotreloader: ^4.0.0
+     hotreloader: ^4.1.0
    ```
 
 1. Enable hot reloading in your entry point dart file, e.g. `bin/main.dart`
