@@ -10,63 +10,63 @@ analyzer:
 
 # see:
 #  https://github.com/dart-lang/linter/tree/master/lib/src/rules
-#  https://dart-lang.github.io/linter/lints/
+#  https://dart.dev/tools/linter-rules/
 linter:
   rules:
-    # https://dart-lang.github.io/linter/lints/avoid_dynamic_calls.html
+    # https://dart.dev/tools/linter-rules/avoid_dynamic_calls
     avoid_dynamic_calls: false
 
     # https://github.com/passsy/dart-lint/blob/master/lib/analysis_options.yaml
     avoid_equals_and_hash_code_on_mutable_classes: true
 
-    # https://dart-lang.github.io/linter/lints/avoid_returning_this.html
+    # https://dart.dev/tools/linter-rules/avoid_returning_this
     avoid_returning_this: true
 
-    # https://dart-lang.github.io/linter/lints/avoid_final_parameters.html
+    # https://dart.dev/tools/linter-rules/avoid_final_parameters
     avoid_final_parameters: false
 
-    # https://dart-lang.github.io/linter/lints/avoid_slow_async_io.html
+    # https://dart.dev/tools/linter-rules/avoid_slow_async_io
     avoid_slow_async_io: true
 
-    # https://dart-lang.github.io/linter/lints/constant_identifier_names.html
+    # https://dart.dev/tools/linter-rules/constant_identifier_names
     constant_identifier_names: false
 
     # https://github.com/passsy/dart-lint/blob/master/lib/analysis_options.yaml
     lines_longer_than_80_chars: false
 
-    # https://dart-lang.github.io/linter/lints/literal_only_boolean_expressions.html
+    # https://dart.dev/tools/linter-rules/literal_only_boolean_expressions
     literal_only_boolean_expressions: true
 
-    # https://dart-lang.github.io/linter/lints/omit_local_variable_types.html
+    # https://dart.dev/tools/linter-rules/omit_local_variable_types
     omit_local_variable_types: true
 
-    # https://dart-lang.github.io/linter/lints/prefer_mixin.html
+    # https://dart.dev/tools/linter-rules/prefer_mixin
     prefer_mixin: true
 
     prefer_single_quotes: true
 
-    # https://dart-lang.github.io/linter/lints/require_trailing_commas.html
+    # https://dart.dev/tools/linter-rules/require_trailing_commas
     require_trailing_commas: false
 
     # allow java-style comments
-    # https://dart-lang.github.io/linter/lints/slash_for_doc_comments.html
+    # https://dart.dev/tools/linter-rules/slash_for_doc_comments
     slash_for_doc_comments: false
 
     # warn if await is missing on calling async func
-    # https://dart-lang.github.io/linter/lints/unawaited_futures.html
+    # https://dart.dev/tools/linter-rules/unawaited_futures
     unawaited_futures: true
 
-    # https://dart-lang.github.io/linter/lints/unnecessary_brace_in_string_interps.html
+    # https://dart.dev/tools/linter-rules/unnecessary_brace_in_string_interps
     unnecessary_brace_in_string_interps: false
 
-    # https://dart-lang.github.io/linter/lints/unnecessary_lambdas.html
+    # https://dart.dev/tools/linter-rules/unnecessary_lambdas
     unnecessary_lambdas: true
 
-    # https://dart-lang.github.io/linter/lints/unnecessary_late.html
+    # https://dart.dev/tools/linter-rules/unnecessary_late
     unnecessary_late: true
 
     # allow new keyword
-    # https://dart-lang.github.io/linter/lints/unnecessary_new.html
+    # https://dart.dev/tools/linter-rules/unnecessary_new
     unnecessary_new: false
 
     # https://github.com/passsy/dart-lint/blob/master/lib/analysis_options.yaml

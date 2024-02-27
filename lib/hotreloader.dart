@@ -3,8 +3,6 @@
  * SPDX-FileContributor: Sebastian Thomschke, Vegard IT GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
-library;
-
 import 'dart:async';
 import 'dart:convert' as convert;
 import 'dart:io' as io;
