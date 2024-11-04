@@ -64,9 +64,8 @@ class AfterReloadContext {
   AfterReloadContext(this.events, this.reloadReports, this.result);
 }
 
-/**
- * Hot code swap/reload service that uses https://pub.dev/packages/watcher to monitor the file system for changes in *.dart files
- */
+/// Hot code swap/reload service that uses https://pub.dev/packages/watcher to
+/// monitor the file system for changes in *.dart files
 class HotReloader {
   static logging.Level get logLevel {
     return log.level;
@@ -76,17 +75,33 @@ class HotReloader {
     log.level = level;
   }
 
-  /**
-   * Creates a new HotReloader instance
-   *
-   * @param automaticReload if false reload must be triggered manually via HotReloader#reloadCode()
-   * @param debounceInterval file changes within this time frame only trigger a single hot reload
-   * @param watchDependencies indicates that changes to library dependencies should also trigger hot reload
-   */
+  /// Creates a new HotReloader instance.
+  ///
+  /// if [automaticReload] is `false`, reload must be triggered manually via
+  /// [HotReloader.reloadCode].
+  /// File changes within [debounceInterval] time frame only trigger a single
+  /// hot reload.
+  ///
+  /// [watchDependencies] indicates that changes to library dependencies should
+  /// also trigger hot reload.
+  ///
+  /// [excludedPaths] may contain relative paths that should be excluded from
+  /// the watch list.
+  /// CAUTION: if the path is inside some of the watched directories, it won't
+  /// be excluded.
+  /// Usually `bin`, `lib` and `test` are watched. When
+  /// [watchDependencies] is `true`, all dependency directories also will be
+  /// watched, which include the project root `./` since
+  /// `.dart_tool/package_config.json` contains the package of the project
+  /// itself. If you don't need watching the entire project's directory, you can
+  /// put the path `./` to the [excludedPaths]. Also you can exclude some path
+  /// dependencies from your workspace putting `../<my-sub-package>` to the
+  /// [excludedPaths].
   static Future<HotReloader> create({
     final bool automaticReload = true,
     final Duration debounceInterval = const Duration(seconds: 1), //
     final bool watchDependencies = true,
+    final Set<String>? excludedPaths,
     final bool Function(BeforeReloadContext ctx)? onBeforeReload,
     final void Function(AfterReloadContext ctx)? onAfterReload,
   }) async {
@@ -98,6 +113,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
 
     final instance = new HotReloader._(
       watchDependencies,
+      excludedPaths,
       debounceInterval,
       await vm_utils.createVmService(),
       onBeforeReload,
@@ -115,6 +131,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
 
   final Duration _debounceInterval;
   final bool _watchDependencies;
+  final Set<String>? _excludedPaths;
   final _watchedStreams = <StreamSubscription<List<WatchEvent>>>{};
   final vms.VmService _vmService;
 
@@ -123,6 +140,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
    */
   HotReloader._(
     this._watchDependencies,
+    this._excludedPaths,
     this._debounceInterval,
     this._vmService,
     this._onBeforeReload,
@@ -164,6 +182,11 @@ For hot code reloading to function properly, Dart needs to be run from the root 
               .forEach(watchList.add);
         }
       }
+    }
+
+    final excludedPaths = _excludedPaths;
+    if (excludedPaths != null) {
+      watchList = watchList.where((e) => !excludedPaths.contains(e)).toList();
     }
 
     watchList = watchList.map(p.absolute).map(p.normalize).toSet().toList();
