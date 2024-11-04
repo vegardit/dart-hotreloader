@@ -236,36 +236,44 @@ For hot code reloading to function properly, Dart needs to be run from the root 
       }
       log.fine('Hot-reloading code of isolate [${isolateRef.name}]...');
 
-      var noVeto = true;
-      if (_onBeforeReload != null) {
-        if (changes?.isEmpty ?? true) {
-          noVeto = _onBeforeReload?.call(new BeforeReloadContext(null, isolateRef)) ?? true;
+      final onBeforeReload = _onBeforeReload;
+      if (onBeforeReload != null) {
+        if (changes == null) {
+          final passed = onBeforeReload(BeforeReloadContext(null, isolateRef));
+          if (!passed) {
+            log.fine('Hot-reloading code of isolate [${isolateRef.name}] '
+              'has been skipped because of listener veto.'
+            );
+            continue;
+          }
         } else {
-          for (final change in changes ?? <WatchEvent>[]) {
-            if (!(_onBeforeReload?.call(new BeforeReloadContext(change, isolateRef)) ?? true)) {
-              noVeto = false;
-            }
+          final passedChanges = changes
+            .map((change) => BeforeReloadContext(change, isolateRef))
+            .map(onBeforeReload)
+            .where((passed) => passed)
+            .length;
+          if (passedChanges <= 0) {
+            log.fine('Hot-reloading code of isolate [${isolateRef.name}] '
+              'has been skipped: no significant changes.'
+            );
+            continue;
           }
         }
       }
 
-      if (noVeto) {
-        try {
-          final reloadReport = await _vmService.reloadSources(isolateRef.id!,
-              force: force, //
-              packagesUri: isPackagesFileChanged ? packagesFile.uri.toString() : null //
-              );
-          if (!(reloadReport.success ?? false)) {
-            failedReloadReports[isolateRef] = reloadReport;
-          }
-          reloadReports[isolateRef] = reloadReport;
-          log.finest('reloadReport for [${isolateRef.name}]: $reloadReport');
-        } on vms.SentinelException catch (ex) {
-          // happens when the isolate has been garbage collected in the meantime
-          log.warning('Failed to reload code of isolate [${isolateRef.name}]: $ex');
+      try {
+        final reloadReport = await _vmService.reloadSources(isolateRef.id!,
+            force: force, //
+            packagesUri: isPackagesFileChanged ? packagesFile.uri.toString() : null //
+            );
+        if (!(reloadReport.success ?? false)) {
+          failedReloadReports[isolateRef] = reloadReport;
         }
-      } else {
-        log.fine('Skipped hot-reloading code of isolate [${isolateRef.name}] because of listener veto.');
+        reloadReports[isolateRef] = reloadReport;
+        log.finest('reloadReport for [${isolateRef.name}]: $reloadReport');
+      } on vms.SentinelException catch (ex) {
+        // happens when the isolate has been garbage collected in the meantime
+        log.warning('Failed to reload code of isolate [${isolateRef.name}]: $ex');
       }
     }
 
