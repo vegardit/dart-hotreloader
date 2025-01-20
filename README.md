@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/vegardit/dart-hotreloader/workflows/Build/badge.svg "GitHub Actions")](https://github.com/vegardit/dart-hotreloader/actions?query=workflow%3ABuild)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE.txt)
 [![Pub Package](https://img.shields.io/pub/v/hotreloader.svg)](https://pub.dev/packages/hotreloader)
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.1%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 1. [What is it?](#what-is-it)
 1. [Requirements](#requirements)
@@ -41,7 +41,7 @@ hotreloader 1.x-2.x requires [Dart SDK](https://dart.dev/get-dart) **2.6.0** or 
 
    ```yaml
    dev_dependencies:
-     hotreloader: ^4.1.0
+     hotreloader: ^4.3.0
    ```
 
 1. Enable hot reloading in your entry point dart file, e.g. `bin/main.dart`
