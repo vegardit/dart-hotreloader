@@ -3,28 +3,46 @@
 # SPDX-FileContributor: Sebastian Thomschke, Vegard IT GmbH
 # SPDX-License-Identifier: Apache-2.0
 
-set -e # abort script at first error
+#####################
+# Script init
+#####################
+set -eu
+
+# execute script with bash if loaded with other shell interpreter
+if [ -z "${BASH_VERSINFO:-}" ]; then /usr/bin/env bash "$0" "$@"; exit; fi
+
 set -o pipefail # causes a pipeline to return the exit status of the last command in the pipe that returned a non-zero return value
 set -o nounset # treat undefined variables as errors
+
+# configure stack trace reporting
+trap 'rc=$?; echo >&2 "$(date +%H:%M:%S) Error - exited with status $rc in [$BASH_SOURCE] at line $LINENO:"; cat -n $BASH_SOURCE | tail -n+$((LINENO - 3)) | head -n7' ERR
+
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+
+#####################
+# Main
+#####################
+cd "$SCRIPT_DIR/.."
 
 if [[ -f .ci/release-trigger.sh ]]; then
    echo "Sourcing [.ci/release-trigger.sh]..."
    source .ci/release-trigger.sh
 fi
 
-cd $(dirname $0)/..
 
 echo
 echo "###################################################"
 echo "# Determining GIT branch......                    #"
 echo "###################################################"
 GIT_BRANCH=$(git branch --show-current)
-echo "  -> GIT Branch: $GIT_BRANCH"; echo
+echo "  -> GIT Branch: $GIT_BRANCH"
 
+
+echo
 echo "###########################################################"
 echo "# Testing Dart Library Package...                         #"
 echo "###########################################################"
-echo " -> GIT Branch: $GIT_BRANCH"
 projectVersion="$(grep "version: " pubspec.yaml | cut -f2 -d" ")"
 echo " -> Current Version: $projectVersion"
 echo " -> Release Version: $RELEASE_VERSION"

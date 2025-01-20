@@ -36,7 +36,6 @@ jobs:
         DART_VERSION:
           # https://dart.dev/get-dart/archive
           - stable
-          - 3.1.1
           - 3.0.0
         OS:
           - ubuntu-latest
