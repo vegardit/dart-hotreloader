@@ -135,7 +135,7 @@ Future<void> main() async {
 - https://pub.dev/packages/jaguar_hotreload (last update 02/2019)
 - https://pub.dev/packages/recharge (last update 04/2022)
 - https://pub.dev/packages/reloader (last update 01/2019)
-
+- https://pub.dev/packages/hmr (last update 02/2025)
 
 ## <a name="changelog"></a>Changelog / Version History
 
