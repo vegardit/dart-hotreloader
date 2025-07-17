@@ -64,8 +64,10 @@ class AfterReloadContext {
   AfterReloadContext(this.events, this.reloadReports, this.result);
 }
 
-/// Hot code swap/reload service that uses https://pub.dev/packages/watcher to
-/// monitor the file system for changes in *.dart files
+/**
+ * Hot code swap/reload service that uses https://pub.dev/packages/watcher to
+ * monitor the file system for changes in *.dart files
+ */
 class HotReloader {
   static logging.Level get logLevel {
     return log.level;
@@ -75,28 +77,23 @@ class HotReloader {
     log.level = level;
   }
 
-  /// Creates a new HotReloader instance.
-  ///
-  /// if [automaticReload] is `false`, reload must be triggered manually via
-  /// [HotReloader.reloadCode].
-  /// File changes within [debounceInterval] time frame only trigger a single
-  /// hot reload.
-  ///
-  /// [watchDependencies] indicates that changes to library dependencies should
-  /// also trigger hot reload.
-  ///
-  /// [excludedPaths] may contain relative paths that should be excluded from
-  /// the watch list.
-  /// CAUTION: if the path is inside some of the watched directories, it won't
-  /// be excluded.
-  /// Usually `bin`, `lib` and `test` are watched. When
-  /// [watchDependencies] is `true`, all dependency directories also will be
-  /// watched, which include the project root `./` since
-  /// `.dart_tool/package_config.json` contains the package of the project
-  /// itself. If you don't need watching the entire project's directory, you can
-  /// put the path `./` to the [excludedPaths]. Also you can exclude some path
-  /// dependencies from your workspace putting `../<my-sub-package>` to the
-  /// [excludedPaths].
+  /**
+   * Creates a new HotReloader instance that monitors and reloads Dart code changes.
+   *
+   * By default, watches `bin`, `lib`, and `test` directories for changes
+   * and automatically triggers hot reload when Dart files are modified.
+   *
+   * Set [automaticReload] to `false` to require manual reload via [reloadCode].
+   * The [debounceInterval] specifies the minimum time between reloads; changes within this window are batched together.
+   * When [watchDependencies] is `true`, changes to package dependencies also trigger reload (includes project root).
+   * [excludedPaths] removes paths from the calculated watch list before watchers are created. Common uses:
+   * - Exclude default directories like `test` if not needed
+   * - Exclude `./` to avoid watching the entire project root when [watchDependencies] is true
+   * - Exclude sibling packages like `../other-package` from triggering reloads
+   * Note: Only works on top-level paths; cannot exclude subdirectories of watched directories.
+   * The [onBeforeReload] callback can veto reloads by returning `false`.
+   * The [onAfterReload] callback receives reload results for custom handling.
+   */
   static Future<HotReloader> create({
     final bool automaticReload = true,
     final Duration debounceInterval = const Duration(seconds: 1), //
@@ -264,21 +261,17 @@ For hot code reloading to function properly, Dart needs to be run from the root 
         if (changes == null) {
           final passed = onBeforeReload(BeforeReloadContext(null, isolateRef));
           if (!passed) {
-            log.fine('Hot-reloading code of isolate [${isolateRef.name}] '
-              'has been skipped because of listener veto.'
-            );
+            log.fine('Hot-reloading code of isolate [${isolateRef.name}] has been skipped because of listener veto.');
             continue;
           }
         } else {
           final passedChanges = changes
-            .map((change) => BeforeReloadContext(change, isolateRef))
-            .map(onBeforeReload)
-            .where((passed) => passed)
-            .length;
+              .map((change) => BeforeReloadContext(change, isolateRef))
+              .map(onBeforeReload)
+              .where((passed) => passed)
+              .length;
           if (passedChanges <= 0) {
-            log.fine('Hot-reloading code of isolate [${isolateRef.name}] '
-              'has been skipped: no significant changes.'
-            );
+            log.fine('Hot-reloading code of isolate [${isolateRef.name}] has been skipped: no significant changes.');
             continue;
           }
         }
