@@ -12,5 +12,5 @@ fi
 
 set -eux
 
-dart analyze --fatal-warnings $(dirname $0)/../lib
-dart analyze --fatal-warnings $(dirname $0)/../test
+dart analyze --fatal-warnings "$(dirname "$0")/../lib"
+dart analyze --fatal-warnings "$(dirname "$0")/../test"

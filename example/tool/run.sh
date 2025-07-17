@@ -11,9 +11,9 @@ if [ "$1" == "--help" ]; then
 fi
 
 cwd=$PWD
-cd $(dirname $0)..
+cd $(dirname "$0")..
 pub get
 cd  $cwd
 
 dart --version
-dart --enable-asserts --enable-vm-service $(dirname $0)../bin/main_dev.dart "$@"
+dart --enable-asserts --enable-vm-service $(dirname "$0")../bin/main_dev.dart "$@"

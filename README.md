@@ -22,11 +22,11 @@ and automatically applies them using the Dart VM's [hot reload](https://github.c
 
 ## <a name="requirements"></a>Requirements
 
-hotreloader 4.x requires [Dart SDK](https://dart.dev/get-dart) **3.0.0** or higher.
+hotreloader 4.x requires [Dart SDK](https://dart.dev/resources/language/evolution#dart-3-0) **3.0.0** or higher.
 
-hotreloader 3.x requires [Dart SDK](https://dart.dev/get-dart) **2.12.0** or higher.
+hotreloader 3.x requires [Dart SDK](https://dart.dev/resources/language/evolution#dart-2-12) **2.12.0** or higher.
 
-hotreloader 1.x-2.x requires [Dart SDK](https://dart.dev/get-dart) **2.6.0** or higher.
+hotreloader 1.x-2.x requires [Dart SDK](https://dart.dev/resources/language/evolution#dart-2-6) **2.6.0** or higher.
 
 
 ## <a name="how-to-use"></a>How to use

@@ -8,6 +8,9 @@ analyzer:
     implicit-casts: false
     implicit-dynamic: false
 
+formatter:
+  page_width: 120
+
 # see:
 #  https://github.com/dart-lang/linter/tree/master/lib/src/rules
 #  https://dart.dev/tools/linter-rules/

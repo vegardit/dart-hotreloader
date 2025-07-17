@@ -12,4 +12,4 @@ fi
 
 set -eux
 
-dart --enable-asserts --enable-vm-service $(dirname $0)/../test/hotreloader_test.dart
+dart --enable-asserts --enable-vm-service "$(dirname "$0")/../test/hotreloader_test.dart"

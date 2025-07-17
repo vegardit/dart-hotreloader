@@ -12,5 +12,5 @@ fi
 
 set -eux
 
-dart format --line-length 120 $(dirname $0)/../lib
-dart format --line-length 120 $(dirname $0)/../test
+dart format "$(dirname "$0")/../lib"
+dart format "$(dirname "$0")/../test"

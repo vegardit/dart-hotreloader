@@ -6,8 +6,8 @@
 if "%1" == "--help" goto :display_help
 if "%1" == "/?" goto :display_help
 
-dart format --line-length 120 %~dp0..\lib
-dart format --line-length 120 %~dp0..\test
+dart format %~dp0..\lib
+dart format %~dp0..\test
 goto :eof
 
 
