@@ -85,7 +85,7 @@ jobs:
 
     - name: Git Checkout
       if: ${{ steps.init.outputs.MAY_CREATE_RELEASE != 'true' }}
-      uses: actions/checkout@v5  # https://github.com/actions/checkout
+      uses: actions/checkout@v6  # https://github.com/actions/checkout
 
 
     # Publishing Dart packages automatically requires to run a workflow on a newly created tag https://dart.dev/tools/pub/automated-publishing
@@ -95,7 +95,7 @@ jobs:
     # https://github.com/orgs/community/discussions/27194
     - name: Git Checkout
       if: ${{ steps.init.outputs.MAY_CREATE_RELEASE == 'true' }}
-      uses: actions/checkout@v5 #https://github.com/actions/checkout
+      uses: actions/checkout@v6 #https://github.com/actions/checkout
       with:
         ssh-key: ${{ secrets.DART_PUB_DEPLOY_KEY }}
 
