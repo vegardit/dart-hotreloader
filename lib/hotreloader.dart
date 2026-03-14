@@ -4,15 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import 'dart:async';
-import 'dart:convert' as convert;
 import 'dart:io' as io;
-import 'dart:isolate' as isolates;
 
-import 'package:collection/collection.dart' show IterableExtension;
+import 'package:hotreloader/src/package.dart';
 import 'package:hotreloader/src/util/docker.dart' as docker;
-import 'package:hotreloader/src/util/files.dart' show UriExtensions;
-import 'package:hotreloader/src/util/pub.dart' as pub;
-import 'package:hotreloader/src/util/strings.dart' as strings;
+import 'package:hotreloader/src/util/iterable.dart';
 import 'package:hotreloader/src/util/vm.dart' as vm_utils;
 import 'package:logging/logging.dart' as logging;
 import 'package:path/path.dart' as p;
@@ -164,90 +160,55 @@ For hot code reloading to function properly, Dart needs to be run from the root 
    */
   Future<void> _registerWatchers() async {
     if (_watchedStreams.isNotEmpty) {
-      await stop();
+      await _stopWatching();
     }
 
-    var watchList = ['bin', 'lib', 'test'];
-    var context = p.context;
+    await Package.init();
+    final packageUri = Package.packageUri;
+    if (packageUri == null) {
+      log.warning('Failed to watch: unable to define the package uri.');
+      return;
+    }
+    final projectUri = Package.projectUri ?? packageUri;
+    final excludedPaths = (_excludedPaths ?? const {})
+      .map((e) => e.trim())
+      .where((e) => e.isNotEmpty)
+      .map(p.normalize)
+      .map(projectUri.resolve)
+      .map((e) => e.toFilePath())
+      .toSet();
+    final watchList = ['bin', 'lib', 'test']
+      .map(packageUri.resolve)
+      .map((e) => e.toFilePath())
+      .whereIf(excludedPaths.isNotEmpty, (e) => !excludedPaths.contains(e))
+      .toList()
+    ;
 
-    final packagesFilePath = (await pub.packagesFile).path;
-    final packagesDirPath = p.dirname(packagesFilePath);
-    final projectPath = p.dirname(packagesDirPath);
-    if (p.isAbsolute(projectPath) && context.current != projectPath) {
-      // The package is a part of the pub workspace. Change the context to the
-      // workspace root and correct relative paths in the watchList.
-      context = p.Context(current: projectPath);
-      watchList = watchList
-        .map(p.absolute)
-        .map(context.relative)
-        .toList();
+    final configUri = Package.configUri;
+    if (configUri != null) {
+      watchList.add(configUri.toFilePath());
+    }
+    final graphUri = Package.graphUri;
+    if (graphUri != null) {
+      watchList.add(graphUri.toFilePath());
     }
 
     if (_watchDependencies) {
-      final pubCachePath = pub.pubCacheDir.path;
-      log.fine('pubCachePath: [$pubCachePath]');
-
-      bool isNotPubCached(final String path)
-      {
-        if (path == pubCachePath || p.isWithin(pubCachePath, path)) {
-          log.fine('Skipped watching cached package at [$path]');
-          return false;
-        }
-        return true;
-      }
-
-      // add .packages file to watch list
-      watchList.add(packagesFilePath);
-      // add source folders of all dependencies to watch list
-      final pkgConfigURL = await isolates.Isolate.packageConfig;
-      if (pkgConfigURL != null) {
-        log.config('pkgConfigURL: $pkgConfigURL');
-        if (pkgConfigURL.path.endsWith('.json')) {
-          final config = convert.json
-            .decode(await new io.File(pkgConfigURL.toFilePath()).readAsString());
-          final packages = config is Map<String, dynamic>
-            ? config['packages']
-            : null;
-          if (packages is List) {
-            packages
-              .whereType<Map<String, dynamic>>()
-              .map((v) => v['rootUri'].toString())
-
-              // '../' means relative to <project>/.dart_tool
-              // since we are already at <project> level we change '../' to './'
-              .map((rootUri) => rootUri.startsWith('../')
-                ? rootUri.substring(1)
-                : rootUri
-              )
-
-              .map((rootUri) => Uri.parse(rootUri).toFilePath())
-              .where(isNotPubCached)
-              .forEach(watchList.add);
-          } else {
-            log.config(
-              'Failed to watch dependencies: bad package config format.'
-            );
-          }
-        } else {
-          await pkgConfigURL
-              .readLineByLine()
-              .where((l) => !l.startsWith('#') && l.contains(':'))
-              .map((l) => Uri.parse(strings.substringAfter(l, ':')).toFilePath())
-              .where(isNotPubCached)
-              .forEach(watchList.add);
-        }
+      final dependencies = Package.dependencies;
+      if (dependencies == null) {
+        log.warning('Failed to watch package dependencies: not defined.');
+      } else {
+        dependencies
+          .where((e) => !e.isPubCached)
+          .whereIf(excludedPaths.isNotEmpty,
+            (e) => !excludedPaths.contains(e.uri.toFilePath())
+          )
+          .map((e) => e.uri.toFilePath())
+          .forEach(watchList.add)
+        ;
       }
     }
 
-    final excludedPaths = _excludedPaths;
-    if (excludedPaths != null) {
-      watchList = watchList.where((e) => !excludedPaths.contains(e)).toList();
-    }
-
-    watchList = watchList
-      .map(context.absolute)
-      .map(context.normalize)
-      .toSet().toList();
     watchList.sort();
 
     final isDockerized = await docker.isRunningInDockerContainer;
@@ -294,12 +255,11 @@ For hot code reloading to function properly, Dart needs to be run from the root 
   ) async {
     log.info('Hot-reloading code...');
 
-    final packagesFile = await pub.packagesFile;
-    final isPackagesFileChanged = null !=
-        changes?.firstWhereOrNull((c) =>
-                c.path.endsWith('.packages') && //
-                new io.File(c.path).absolute.path == packagesFile.path //
-            );
+    final configPaths = {
+      Package.configUri?.toFilePath(), Package.graphUri?.toFilePath()
+    };
+    final isConfigFileChanged = changes != null
+      && changes.any((c) => configPaths.contains(io.File(c.path).absolute.path));
 
     final reloadReports = <vms.IsolateRef, vms.ReloadReport>{};
     final failedReloadReports = <vms.IsolateRef, vms.ReloadReport>{};
@@ -333,9 +293,8 @@ For hot code reloading to function properly, Dart needs to be run from the root 
 
       try {
         final reloadReport = await _vmService.reloadSources(isolateRef.id!,
-            force: force, //
-            packagesUri: isPackagesFileChanged ? packagesFile.uri.toString() : null //
-            );
+          force: force,
+        );
         if (!(reloadReport.success ?? false)) {
           failedReloadReports[isolateRef] = reloadReport;
         }
@@ -347,7 +306,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
       }
     }
 
-    if (isPackagesFileChanged) {
+    if (isConfigFileChanged) {
       await _registerWatchers();
     }
 
@@ -376,10 +335,23 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     return HotReloadResult.PartiallySucceeded;
   }
 
+  Future<void> _stopWatching() async {
+    if (_watchedStreams.isNotEmpty) {
+      log.info('Stopping to watch paths...');
+      await Future.wait<dynamic>(_watchedStreams.map((s) => s.cancel()));
+      _watchedStreams.clear();
+    } else {
+      log.fine('Was not watching any paths.');
+    }
+  }
+
   Future<void> _onFilesModified(final List<WatchEvent> changes) async {
-    // ignore non-dart file changes
-    final packagesFile = await pub.packagesFile;
-    changes.retainWhere((ev) => ev.path.endsWith('.dart') || ev.path == packagesFile.path);
+    final configPaths = {
+      Package.configUri?.toFilePath(), Package.graphUri?.toFilePath()
+    };
+    changes.retainWhere((ev) => ev.path.endsWith('.dart')
+      || configPaths.contains(io.File(ev.path).absolute.path)
+    );
     if (changes.isEmpty) return;
 
     for (final event in changes) {
@@ -401,20 +373,13 @@ For hot code reloading to function properly, Dart needs to be run from the root 
   }
 
   /**
-   * Stops watching for changes on the file system
+   * Stops watching for changes on the file system and dispose the [HotReloader].
+   *
+   * After that you can't [reloadCode] anymore. Instead, you should create a new
+   * [HotReloader].
    */
   Future<void> stop() async {
-    if (_watchedStreams.isNotEmpty) {
-      log.info('Stopping to watch paths...');
-      await Future.wait<dynamic>(_watchedStreams.map((s) => s.cancel()));
-      _watchedStreams.clear();
-    } else {
-      log.fine('Was not watching any paths.');
-    }
-
-    // to prevent "Unhandled exception: reloadSources: (-32000) Service connection disposed"
-    await Future<void>.delayed(const Duration(seconds: 2));
-
+    await _stopWatching();
     await _vmService.dispose();
   }
 }

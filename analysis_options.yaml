@@ -1,7 +1,7 @@
 #include: package:pedantic/analysis_options.yaml
 
-# https://github.com/passsy/dart-lint/blob/master/lib/analysis_options.yaml
-include: package:lint/analysis_options.yaml
+# https://github.com/passsy/dart-lint/blob/master/lib/strict.yaml
+include: package:lint/strict.yaml
 
 analyzer:
   strong-mode:
