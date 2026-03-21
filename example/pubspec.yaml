@@ -10,7 +10,6 @@ environment:
 dependencies:
   dummylib:
     path: ./dummylib_v1
-
-dev_dependencies:
   hotreloader:  # https://pub.dev/packages/hotreloader
     path: ..
+  logging: ^1.3.0

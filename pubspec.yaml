@@ -17,7 +17,6 @@ environment:
 
 # https://dart.dev/tools/pub/dependencies#version-constraints
 dependencies:
-  collection:       ^1.15.0 # https://pub.dev/packages/collection
   logging:          ^1.0.0  # https://pub.dev/packages/logging
   path:             ^1.8.0  # https://pub.dev/packages/path
   stream_transform: ^2.0.0  # https://pub.dev/packages/stream_transform
