@@ -254,12 +254,20 @@ class Package
   static Uri _getPubCacheDirectory()
   {
     final env = Platform.environment;
-    final path = env['PUB_CACHE'] ?? (
-      Platform.isWindows
-        ? '${env['APPDATA']}\\Pub\\Cache'
-        : '${env['HOME']}/.pub-cache'
-    );
-    return Directory(normalize(path)).absolute.uri;
+    var path = env['PUB_CACHE'];
+    if (path == null) {
+      if (Platform.isWindows) {
+        path = normalize('${env['APPDATA']}\\Pub\\Cache');
+        if (!Directory(path).existsSync()) {
+          path = normalize('${env['LOCALAPPDATA']}\\Pub\\Cache');
+        }
+      } else {
+        path = normalize('${env['HOME']}/.pub-cache');
+      }
+    } else {
+      path = normalize(path);
+    }
+    return Directory(path).absolute.uri;
   }
 
   static Uri? _packageUri;
