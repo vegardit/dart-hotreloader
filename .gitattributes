@@ -39,6 +39,7 @@
 # Config/Serialisation
 .editorconfig    text
 **/.editorconfig text
+*.graphql        text
 *.ini            text
 *.properties     text
 *.json           text
@@ -58,6 +59,7 @@
 *.zsh        text eol=lf
 *.lua        text
 *.php        text
+*.py         text
 *.python     text
 *.sql        text
 
@@ -123,6 +125,8 @@
 *.htm        text diff=html
 *.html       text diff=html
 *.js         text
+*.ts         text
+*.vue        text
 
 
 # https://git-scm.com/docs/gitattributes#_export_ignore
