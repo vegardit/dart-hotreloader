@@ -146,9 +146,9 @@ class Package {
       projectUri = dartToolDirectory.parent.uri;
       final List<Package>? packages;
       if (configFile.existsSync()) {
-        final jsonValue = jsonDecode(await configFile.readAsString());
+        final Object? jsonValue = jsonDecode(await configFile.readAsString());
         if (jsonValue is Map<String, dynamic>) {
-          final jsonPackages = jsonValue['packages'];
+          final Object? jsonPackages = jsonValue['packages'];
           if (jsonPackages is List) {
             packages = jsonPackages
                 .whereType<Map<String, dynamic>>()
@@ -190,9 +190,9 @@ class Package {
         if (packages == null) {
           dependencies = null;
         } else if (graphFile != null && graphFile.existsSync()) {
-          final jsonValue = jsonDecode(await graphFile.readAsString());
+          final Object? jsonValue = jsonDecode(await graphFile.readAsString());
           if (jsonValue is Map<String, dynamic>) {
-            final jsonPackages = jsonValue['packages'];
+            final Object? jsonPackages = jsonValue['packages'];
             if (jsonPackages is List) {
               final graphPackages = jsonPackages.whereType<Map<String, dynamic>>().map(GraphPackage.fromJson);
               final packageGraph = {for (final package in graphPackages) package.name: package.dependencies};
@@ -274,7 +274,7 @@ class GraphPackage {
   });
 
   factory GraphPackage.fromJson(final Map<String, dynamic> jsonValue) {
-    final jsonDependencies = jsonValue['dependencies'];
+    final Object? jsonDependencies = jsonValue['dependencies'];
     return GraphPackage(
       name: jsonValue['name'].toString(),
       dependencies: jsonDependencies is List ? jsonDependencies.whereType<String>().toList() : [],

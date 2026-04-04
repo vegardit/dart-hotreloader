@@ -358,7 +358,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     // slower machines. Drain them in order so the VM service stays alive until the
     // last accepted automatic reload has finished.
     final previousAutomaticReload = _pendingAutomaticReload;
-    _pendingAutomaticReload = () async {
+    return _pendingAutomaticReload = () async {
       try {
         await previousAutomaticReload;
       } catch (_) {
@@ -367,7 +367,6 @@ For hot code reloading to function properly, Dart needs to be run from the root 
       if (_isStopping) return;
       await _reloadCode(changes, false);
     }();
-    return _pendingAutomaticReload;
   }
 
   bool get isWatching => _watchedStreams.isNotEmpty;
