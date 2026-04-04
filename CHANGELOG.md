@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.4.0] - 2026-04-05
+
+### Added
+
+- [#27](https://github.com/vegardit/dart-hotreloader/issues/27) Watching dependencies based on package graph
+- [#26](https://github.com/vegardit/dart-hotreloader/issues/26) Support monorepo with pub workspace
+
 ## [4.3.0] - 2025-01-20
 
 ### Changed
