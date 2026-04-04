@@ -12,4 +12,4 @@ dependencies:
     path: ./dummylib_v1
   hotreloader:  # https://pub.dev/packages/hotreloader
     path: ..
-  logging: ^1.3.0
+  logging: ^1.0.0  # https://pub.dev/packages/logging
