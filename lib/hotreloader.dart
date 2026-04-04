@@ -140,6 +140,8 @@ For hot code reloading to function properly, Dart needs to be run from the root 
   final Duration _debounceInterval;
   final bool _watchDependencies;
   final Set<String>? _excludedPaths;
+  bool _isStopping = false;
+  Future<void> _pendingAutomaticReload = Future<void>.value();
   final _watchedStreams = <StreamSubscription<List<WatchEvent>>>{};
   final vms.VmService _vmService;
 
@@ -301,7 +303,7 @@ For hot code reloading to function properly, Dart needs to be run from the root 
       }
     }
 
-    if (isConfigFileChanged) {
+    if (isConfigFileChanged && !_isStopping) {
       await _registerWatchers();
     }
 
@@ -340,16 +342,32 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     }
   }
 
-  Future<void> _onFilesModified(final List<WatchEvent> changes) async {
+  Future<void> _onFilesModified(final List<WatchEvent> changes) {
+    if (_isStopping) return Future<void>.value();
+
     final configPaths = {Package.configUri?.toFilePath(), Package.graphUri?.toFilePath()};
     changes.retainWhere((ev) => ev.path.endsWith('.dart') || configPaths.contains(io.File(ev.path).absolute.path));
-    if (changes.isEmpty) return;
+    if (changes.isEmpty) return Future<void>.value();
 
     for (final event in changes) {
       log.info('Change detected: type=[${event.type}] path=[${event.path}]');
     }
     log.finest(changes);
-    await _reloadCode(changes, false);
+
+    // Buffered watcher callbacks can still arrive while stop() is tearing down on
+    // slower machines. Drain them in order so the VM service stays alive until the
+    // last accepted automatic reload has finished.
+    final previousAutomaticReload = _pendingAutomaticReload;
+    _pendingAutomaticReload = () async {
+      try {
+        await previousAutomaticReload;
+      } catch (_) {
+        // Keep later reloads flowing even if an earlier callback failed.
+      }
+      if (_isStopping) return;
+      await _reloadCode(changes, false);
+    }();
+    return _pendingAutomaticReload;
   }
 
   bool get isWatching => _watchedStreams.isNotEmpty;
@@ -370,7 +388,9 @@ For hot code reloading to function properly, Dart needs to be run from the root 
    * [HotReloader].
    */
   Future<void> stop() async {
+    _isStopping = true;
     await _stopWatching();
+    await _pendingAutomaticReload;
     await _vmService.dispose();
   }
 }
