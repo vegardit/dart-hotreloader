@@ -9,9 +9,7 @@ import 'dart:isolate';
 
 import 'package:path/path.dart';
 
-
-class Package
-{
+class Package {
   /// The name of the package.
   final String name;
 
@@ -83,8 +81,7 @@ class Package
     required this.baseUri,
   });
 
-  factory Package.fromJson(final Map<String, dynamic> jsonValue)
-  {
+  factory Package.fromJson(final Map<String, dynamic> jsonValue) {
     final rootUri = Uri.parse(jsonValue['rootUri'].toString());
     final uri = Uri.directory(rootUri.toFilePath());
     return Package(
@@ -99,10 +96,10 @@ class Package
   /// When the current [uri] is absolute, the [uri] of the returning package
   /// remains the same.
   Package absolute(final Uri baseUri) => Package(
-    name: name,
-    uri: baseUri.resolveUri(uri),
-    baseUri: baseUri,
-  );
+        name: name,
+        uri: baseUri.resolveUri(uri),
+        baseUri: baseUri,
+      );
 
   @override
   String toString() => 'Package $name ($uri)';
@@ -116,19 +113,14 @@ class Package
   /// Tries to load the information from the `package_config.json` and
   /// `graph_config.json` files. When fails, looks up `pubspec.yaml` files
   /// relative to the [Platform.script] path.
-  static Future<void> init() async
-  {
+  static Future<void> init() async {
     final Uri? packageUri;
     final Uri? projectUri;
     final Set<Package>? dependencies;
     final configUri = await Isolate.packageConfig;
-    final configFile = configUri == null
-      ? null
-      : File.fromUri(configUri);
+    final configFile = configUri == null ? null : File.fromUri(configUri);
     final graphUri = configFile?.parent.uri.resolve('package_graph.json');
-    final graphFile = graphUri == null
-      ? null
-      : File.fromUri(graphUri);
+    final graphFile = graphUri == null ? null : File.fromUri(graphUri);
 
     final scriptUri = Platform.script;
     if (configFile == null) {
@@ -159,9 +151,9 @@ class Package
           final jsonPackages = jsonValue['packages'];
           if (jsonPackages is List) {
             packages = jsonPackages
-              .whereType<Map<String, dynamic>>()
-              .map((e) => Package.fromJson(e).absolute(baseUri))
-              .toList();
+                .whereType<Map<String, dynamic>>()
+                .map((e) => Package.fromJson(e).absolute(baseUri))
+                .toList();
           } else {
             packages = null;
           }
@@ -202,18 +194,12 @@ class Package
           if (jsonValue is Map<String, dynamic>) {
             final jsonPackages = jsonValue['packages'];
             if (jsonPackages is List) {
-              final graphPackages = jsonPackages
-                .whereType<Map<String, dynamic>>()
-                .map(GraphPackage.fromJson);
-              final packageGraph = { for (final package in graphPackages)
-                package.name: package.dependencies
+              final graphPackages = jsonPackages.whereType<Map<String, dynamic>>().map(GraphPackage.fromJson);
+              final packageGraph = {for (final package in graphPackages) package.name: package.dependencies};
+              final packageDict = {
+                for (final package in packages) package.name: package,
               };
-              final packageDict = { for (final package in packages)
-                package.name: package,
-              };
-              dependencies = GraphPackage.collectDependencies(
-                projectPackage.name, packageDict, packageGraph
-              );
+              dependencies = GraphPackage.collectDependencies(projectPackage.name, packageDict, packageGraph);
             } else {
               dependencies = packages.toSet();
             }
@@ -238,8 +224,7 @@ class Package
   ///
   /// Returns the URI of the `pubspec.yaml` file on success, otherwise returns
   /// `null`.
-  static Future<Uri?> _findPubspecUri(final Directory directory) async
-  {
+  static Future<Uri?> _findPubspecUri(final Directory directory) async {
     final entities = directory.list();
     await for (final entity in entities) {
       if (entity.uri.pathSegments.last == 'pubspec.yaml') {
@@ -251,8 +236,7 @@ class Package
     return _findPubspecUri(parent);
   }
 
-  static Uri _getPubCacheDirectory()
-  {
+  static Uri _getPubCacheDirectory() {
     final env = Platform.environment;
     var path = env['PUB_CACHE'];
     if (path == null) {
@@ -277,12 +261,10 @@ class Package
   static Set<Package>? _dependencies;
 }
 
-
 typedef PackageDict = Map<String, Package>;
 typedef PackageGraph = Map<String, List<String>>;
 
-class GraphPackage
-{
+class GraphPackage {
   final String name;
   final List<String> dependencies;
 
@@ -291,26 +273,17 @@ class GraphPackage
     required this.dependencies,
   });
 
-  factory GraphPackage.fromJson(final Map<String, dynamic> jsonValue)
-  {
+  factory GraphPackage.fromJson(final Map<String, dynamic> jsonValue) {
     final jsonDependencies = jsonValue['dependencies'];
     return GraphPackage(
       name: jsonValue['name'].toString(),
-      dependencies: jsonDependencies is List
-        ? jsonDependencies.whereType<String>().toList()
-        : [],
+      dependencies: jsonDependencies is List ? jsonDependencies.whereType<String>().toList() : [],
     );
   }
 
   static Set<Package> collectDependencies(
-    final String packageName,
-    final PackageDict packageDict,
-    final PackageGraph packageGraph,
-    [
-      final Set<String> stack = const {}
-    ]
-  )
-  {
+      final String packageName, final PackageDict packageDict, final PackageGraph packageGraph,
+      [final Set<String> stack = const {}]) {
     final packages = <Package>{};
     if (stack.contains(packageName)) {
       // A cyclic dependency, break it.
@@ -321,10 +294,7 @@ class GraphPackage
       final package = packageDict[dependency];
       if (package != null) {
         if (packages.add(package)) {
-          collectDependencies(package.name, packageDict, packageGraph,
-            { ...stack, packageName }
-          )
-          .forEach(packages.add);
+          collectDependencies(package.name, packageDict, packageGraph, {...stack, packageName}).forEach(packages.add);
         }
       }
     }

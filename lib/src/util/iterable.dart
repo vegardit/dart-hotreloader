@@ -6,8 +6,6 @@
 typedef Test<E> = bool Function(E element);
 typedef Convert<T, E> = T Function(E element);
 
-extension ConditionalWhere<E> on Iterable<E>
-{
-  Iterable<E> whereIf(final bool condition, final Test<E> test) =>
-    condition ? where(test) : this;
+extension ConditionalWhere<E> on Iterable<E> {
+  Iterable<E> whereIf(final bool condition, final Test<E> test) => condition ? where(test) : this;
 }

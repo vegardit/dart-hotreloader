@@ -171,18 +171,17 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     }
     final projectUri = Package.projectUri ?? packageUri;
     final excludedPaths = (_excludedPaths ?? const {})
-      .map((e) => e.trim())
-      .where((e) => e.isNotEmpty)
-      .map(p.normalize)
-      .map(projectUri.resolve)
-      .map((e) => e.toFilePath())
-      .toSet();
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .map(p.normalize)
+        .map(projectUri.resolve)
+        .map((e) => e.toFilePath())
+        .toSet();
     final watchList = ['bin', 'lib', 'test']
-      .map(packageUri.resolve)
-      .map((e) => e.toFilePath())
-      .whereIf(excludedPaths.isNotEmpty, (e) => !excludedPaths.contains(e))
-      .toList()
-    ;
+        .map(packageUri.resolve)
+        .map((e) => e.toFilePath())
+        .whereIf(excludedPaths.isNotEmpty, (e) => !excludedPaths.contains(e))
+        .toList();
 
     final configUri = Package.configUri;
     if (configUri != null) {
@@ -199,13 +198,10 @@ For hot code reloading to function properly, Dart needs to be run from the root 
         log.warning('Failed to watch package dependencies: not defined.');
       } else {
         dependencies
-          .where((e) => !e.isPubCached)
-          .whereIf(excludedPaths.isNotEmpty,
-            (e) => !excludedPaths.contains(e.uri.toFilePath())
-          )
-          .map((e) => e.uri.toFilePath())
-          .forEach(watchList.add)
-        ;
+            .where((e) => !e.isPubCached)
+            .whereIf(excludedPaths.isNotEmpty, (e) => !excludedPaths.contains(e.uri.toFilePath()))
+            .map((e) => e.uri.toFilePath())
+            .forEach(watchList.add);
       }
     }
 
@@ -255,11 +251,9 @@ For hot code reloading to function properly, Dart needs to be run from the root 
   ) async {
     log.info('Hot-reloading code...');
 
-    final configPaths = {
-      Package.configUri?.toFilePath(), Package.graphUri?.toFilePath()
-    };
-    final isConfigFileChanged = changes != null
-      && changes.any((c) => configPaths.contains(io.File(c.path).absolute.path));
+    final configPaths = {Package.configUri?.toFilePath(), Package.graphUri?.toFilePath()};
+    final isConfigFileChanged =
+        changes != null && changes.any((c) => configPaths.contains(io.File(c.path).absolute.path));
 
     final reloadReports = <vms.IsolateRef, vms.ReloadReport>{};
     final failedReloadReports = <vms.IsolateRef, vms.ReloadReport>{};
@@ -292,7 +286,8 @@ For hot code reloading to function properly, Dart needs to be run from the root 
       }
 
       try {
-        final reloadReport = await _vmService.reloadSources(isolateRef.id!,
+        final reloadReport = await _vmService.reloadSources(
+          isolateRef.id!,
           force: force,
         );
         if (!(reloadReport.success ?? false)) {
@@ -346,12 +341,8 @@ For hot code reloading to function properly, Dart needs to be run from the root 
   }
 
   Future<void> _onFilesModified(final List<WatchEvent> changes) async {
-    final configPaths = {
-      Package.configUri?.toFilePath(), Package.graphUri?.toFilePath()
-    };
-    changes.retainWhere((ev) => ev.path.endsWith('.dart')
-      || configPaths.contains(io.File(ev.path).absolute.path)
-    );
+    final configPaths = {Package.configUri?.toFilePath(), Package.graphUri?.toFilePath()};
+    changes.retainWhere((ev) => ev.path.endsWith('.dart') || configPaths.contains(io.File(ev.path).absolute.path));
     if (changes.isEmpty) return;
 
     for (final event in changes) {
