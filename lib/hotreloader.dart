@@ -176,10 +176,11 @@ For hot code reloading to function properly, Dart needs to be run from the root 
         .map((e) => e.trim())
         .where((e) => e.isNotEmpty)
         .map(p.normalize)
-        .map(projectUri.resolve)
+        .map(Uri.directory)
+        .map(projectUri.resolveUri)
         .map((e) => e.toFilePath())
         .toSet();
-    final watchList = ['bin', 'lib', 'test']
+    final watchList = ['./', 'bin/', 'lib/', 'test/']
         .map(packageUri.resolve)
         .map((e) => e.toFilePath())
         .whereIf(excludedPaths.isNotEmpty, (e) => !excludedPaths.contains(e))
