@@ -9,18 +9,20 @@
 1. [Requirements](#requirements)
 1. [How to use](#how-to-use)
 1. [Logging](#logging)
+1. [Pub workspaces](#pub-workspaces)
+1. [Custom watch paths](#custom-watch-paths)
 1. [Alternatives](#alternatives)
 1. [Changelog / Version History](#changelog)
 1. [License](#license)
 
 
-## <a name="what-is-it"></a>What is it?
+## <a id="what-is-it"></a>What is it?
 
 This [Dart](https://dart.dev) library provides a code reloading service that monitors the source files of a Dart project on the local file system for changes
 and automatically applies them using the Dart VM's [hot reload](https://github.com/dart-lang/sdk/wiki/Hot-reload) capabilities to the running Dart process.
 
 
-## <a name="requirements"></a>Requirements
+## <a id="requirements"></a>Requirements
 
 hotreloader 4.x requires [Dart SDK](https://dart.dev/resources/language/evolution#dart-3-0) **3.0.0** or higher.
 
@@ -29,7 +31,7 @@ hotreloader 3.x requires [Dart SDK](https://dart.dev/resources/language/evolutio
 hotreloader 1.x-2.x requires [Dart SDK](https://dart.dev/resources/language/evolution#dart-2-6) **2.6.0** or higher.
 
 
-## <a name="how-to-use"></a>How to use
+## <a id="how-to-use"></a>How to use
 
 1. Add hotreloader to your dev dependencies using this command
 
@@ -96,7 +98,7 @@ Future<void> main(List<String> args) async {
 ```
 
 
-## <a name="logging"></a>Logging
+## <a id="logging"></a>Logging
 
 This library uses the [logging](https://pub.dev/packages/logging) package for logging.
 
@@ -129,7 +131,32 @@ Future<void> main() async {
 ```
 
 
-## <a name="alternatives"></a>Alternatives
+## <a id="pub-workspaces"></a>Pub workspaces (monorepo)
+
+`hotreloader` automatically detects and supports [Pub Workspaces](https://dart.dev/tools/pub/workspaces). If your package is inside a monorepo, the correct package directory and project root are resolved automatically. No additional configuration is required.
+
+In a pub workspace, `packagePathsToWatch` are relative to the **package root**, meaning you specify just `bin`, `lib` - not `packages/my_package/bin`. Meanwhile, `projectPathsToExclude` are relative to the **project root** (the workspace root), so you specify paths like `packages/my_package/test` or `packages/another_package` - typically used to exclude dependent packages within the monorepo from triggering reloads. In a single-package project (non-workspace), both roots are the same directory, so both parameters accept paths relative to that single directory (e.g., just `test` for both).
+
+
+## <a id="custom-watch-paths"></a>Custom watch paths
+
+By default, `hotreloader` watches `bin/`, `lib/`, and `test/` inside your package, following [package layout conventions](https://dart.dev/tools/pub/package-layout). If your project uses a non-standard layout, you can override this behavior using the `packagePathsToWatch` parameter:
+
+```dart
+final reloader = await HotReloader.create(
+  packagePathsToWatch: {'routes', 'public'},
+);
+```
+
+| Parameter | Description |
+|-----------|-------------|
+| `packagePathsToWatch` | Set of paths **relative to the package root** to watch for changes. Default: `{'bin', 'lib', 'test'}` |
+| `projectPathsToExclude` | Set of **top-level paths** relative to the project root to exclude from watching. Cannot exclude subdirectories of watched directories. |
+
+**Note:** If you specify custom `packagePathsToWatch`, the default `bin/`, `lib/`, and `test/` directories are **not** watched unless explicitly included.
+
+
+## <a id="alternatives"></a>Alternatives
 
 - https://pub.dev/packages/angel_hot (last update 05/2019)
 - https://pub.dev/packages/jaguar_hotreload (last update 02/2019)
@@ -137,12 +164,12 @@ Future<void> main() async {
 - https://pub.dev/packages/reloader (last update 01/2019)
 
 
-## <a name="changelog"></a>Changelog / Version History
+## <a id="changelog"></a>Changelog / Version History
 
 This project maintains a [changelog](CHANGELOG.md) and adheres to [Semantic Versioning](https://semver.org) and [Keep a CHANGELOG](https://keepachangelog.com)
 
 
-## <a name="license"></a>License
+## <a id="license"></a>License
 
 All files are released under the [Apache License 2.0](LICENSE.txt).
 

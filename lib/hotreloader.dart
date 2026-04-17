@@ -83,23 +83,27 @@ class HotReloader {
    *
    * The [debounceInterval] specifies the minimum time between reloads; changes within this window are batched together.
    *
-   * When [watchDependencies] is `true`, changes to package dependencies also trigger reload (includes project root).
+   * When [watchDependencies] is `true`, changes to package dependencies also trigger reload.
    *
-   * [excludedPaths] removes paths from the calculated watch list before
-   * watchers are created.
-   * [excludedPaths] are always relative to the project's root directory. If the
-   * project is a pub workspace, the `bin` folder of the package will be located
-   * in the `packages/<package>` folder. That means it should be specified like
-   * `packages/<package>/bin` in [excludedPaths], where `<package>` is the name
-   * of the package where the `HotReloader` is created. If the project consists
-   * of a single package, the `bin` directory lies in the project's root folder
-   * and should be specified like `bin` in [excludedPaths].
-   * Note: Only works on top-level paths; cannot exclude subdirectories of
+   * [packagePathsToWatch] specifies which subdirectories inside the package
+   * should be watched, relative to the **package** root. By default it contains
+   * `bin`, `lib`, and `test`.
+   *
+   * [projectPathsToExclude] removes paths from the calculated watch list before
+   * watchers are created, relative to the **project** root.
+   * **Note:** Only works on top-level paths; cannot exclude subdirectories of
    * watched directories.
    * Common uses:
    * - Exclude default directories like `test` if not needed.
-   * - Exclude `./` to avoid watching the entire project root when [watchDependencies] is true.
-   * - Exclude sibling packages like `../other-package` from triggering reloads.
+   * - Exclude specific local dependencies from triggering reloads.
+   *
+   * If the project is a pub workspace, the `test` folder of the package will be
+   * located in the `packages/<package>` folder. That means it should be
+   * specified like `packages/<package>/test` in [projectPathsToExclude], where
+   * `<package>` is the name of the package where the `HotReloader` is created.
+   * If the project consists of a single package, the `test` directory lies in
+   * the project's root folder and should be specified like `test` in
+   * [projectPathsToExclude].
    *
    * The [onBeforeReload] callback can veto reloads by returning `false`.
    *
@@ -109,7 +113,8 @@ class HotReloader {
     final bool automaticReload = true,
     final Duration debounceInterval = const Duration(seconds: 1),
     final bool watchDependencies = true,
-    final Set<String>? excludedPaths,
+    final Set<String> packagePathsToWatch = const { 'bin', 'lib', 'test' },
+    final Set<String>? projectPathsToExclude,
     final bool Function(BeforeReloadContext ctx)? onBeforeReload,
     final void Function(AfterReloadContext ctx)? onAfterReload,
   }) async {
@@ -121,7 +126,8 @@ For hot code reloading to function properly, Dart needs to be run from the root 
 
     final instance = new HotReloader._(
       watchDependencies,
-      excludedPaths,
+      packagePathsToWatch,
+      projectPathsToExclude,
       debounceInterval,
       await vm_utils.createVmService(),
       onBeforeReload,
@@ -134,14 +140,16 @@ For hot code reloading to function properly, Dart needs to be run from the root 
     return instance;
   }
 
+  bool _isStopping = false;
+  Future<void> _pendingAutomaticReload = Future<void>.value();
+
   final bool Function(BeforeReloadContext ctx)? _onBeforeReload;
   final void Function(AfterReloadContext ctx)? _onAfterReload;
 
   final Duration _debounceInterval;
   final bool _watchDependencies;
-  final Set<String>? _excludedPaths;
-  bool _isStopping = false;
-  Future<void> _pendingAutomaticReload = Future<void>.value();
+  final Set<String> _packagePathsToWatch;
+  final Set<String>? _projectPathsToExclude;
   final _watchedStreams = <StreamSubscription<List<WatchEvent>>>{};
   final vms.VmService _vmService;
 
@@ -150,7 +158,8 @@ For hot code reloading to function properly, Dart needs to be run from the root 
    */
   HotReloader._(
     this._watchDependencies,
-    this._excludedPaths,
+    this._packagePathsToWatch,
+    this._projectPathsToExclude,
     this._debounceInterval,
     this._vmService,
     this._onBeforeReload,
@@ -172,17 +181,21 @@ For hot code reloading to function properly, Dart needs to be run from the root 
       return;
     }
     final projectUri = Package.projectUri ?? packageUri;
-    final excludedPaths = (_excludedPaths ?? const {})
+    final projectPathsToExclude = (_projectPathsToExclude ?? const {})
         .map((e) => e.trim())
         .where((e) => e.isNotEmpty)
         .map(p.normalize)
-        .map(projectUri.resolve)
+        .map(Uri.directory)
+        .map(projectUri.resolveUri)
         .map((e) => e.toFilePath())
         .toSet();
-    final watchList = ['bin', 'lib', 'test']
-        .map(packageUri.resolve)
+    final watchList = _packagePathsToWatch
+        .map(Uri.directory)
+        .map(packageUri.resolveUri)
         .map((e) => e.toFilePath())
-        .whereIf(excludedPaths.isNotEmpty, (e) => !excludedPaths.contains(e))
+        .whereIf(projectPathsToExclude.isNotEmpty,
+          (e) => !projectPathsToExclude.contains(e),
+        )
         .toList();
 
     final configUri = Package.configUri;
@@ -201,8 +214,10 @@ For hot code reloading to function properly, Dart needs to be run from the root 
       } else {
         dependencies
             .where((e) => !e.isPubCached)
-            .whereIf(excludedPaths.isNotEmpty, (e) => !excludedPaths.contains(e.uri.toFilePath()))
             .map((e) => e.uri.toFilePath())
+            .whereIf(projectPathsToExclude.isNotEmpty,
+              (e) => !projectPathsToExclude.contains(e),
+            )
             .forEach(watchList.add);
       }
     }
